@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 /* ═══════════════ ROOT ═══════════════ */
 :root {
@@ -256,67 +257,33 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;fo
 /* ── MP PILL EDITABLE ── */
 .mp-pill{cursor:text;min-width:85px;text-align:center;outline:none;transition:transform .15s;}
 .mp-pill:hover{transform:scale(1.04);}
-.delete-pill{margin-left:8px;cursor:pointer;opacity:.55;font-size:.75em;contenteditable:false;}
+.delete-pill{margin-left:8px;cursor:pointer;opacity:.55;font-size:.75em;}
 .delete-pill:hover{opacity:1;color:#ff3355;}
 
-/* ── IMPORT MODAL ── */
-.imp-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;align-items:center;justify-content:center;}
-.imp-ov.open{display:flex;}
-.imp-box{background:#13131f;border:1px solid var(--cyan);border-radius:14px;width:92%;max-width:560px;padding:26px;position:relative;}
-.imp-title{font-family:'Orbitron',sans-serif;font-size:.9rem;color:var(--cyan);letter-spacing:.1em;margin-bottom:18px;}
-.imp-tabs{display:flex;gap:8px;margin-bottom:18px;}
-.imp-tab{padding:7px 18px;border-radius:6px;border:1px solid rgba(255,255,255,.12);background:transparent;color:var(--dim);cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:600;transition:all .15s;}
-.imp-tab.active{background:rgba(0,212,255,.12);border-color:var(--cyan);color:var(--cyan);}
-.imp-tab-content{display:none;}
-.imp-tab-content.active{display:block;}
-
-/* drop zone */
-.drop-zone{
-  border:2px dashed rgba(0,212,255,.35);border-radius:10px;
-  padding:30px 20px;text-align:center;cursor:pointer;
-  background:rgba(0,212,255,.04);transition:all .2s;position:relative;
-}
-.drop-zone:hover,.drop-zone.dragover{border-color:var(--cyan);background:rgba(0,212,255,.1);}
-.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.dz-icon{font-size:2rem;margin-bottom:8px;}
-.dz-text{color:var(--dim);font-size:.84rem;line-height:1.6;}
-.dz-preview{max-width:100%;max-height:160px;border-radius:8px;margin-top:12px;display:none;object-fit:contain;}
-
-/* text area */
-.imp-textarea{
-  width:100%;height:160px;background:#0f0f17;
-  border:1px solid rgba(255,255,255,.12);border-radius:8px;
-  color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.85rem;
-  padding:12px;resize:vertical;outline:none;line-height:1.6;
-}
-.imp-textarea:focus{border-color:var(--cyan);}
-.imp-hint{font-size:.75rem;color:var(--dim);margin-top:6px;line-height:1.5;}
-
-/* status */
-.imp-status{
-  margin-top:14px;padding:10px 14px;border-radius:8px;
-  font-size:.83rem;font-weight:600;display:none;
-}
-.imp-status.loading{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);color:var(--cyan);}
-.imp-status.success{background:rgba(0,232,122,.1);border:1px solid rgba(0,232,122,.3);color:var(--green);}
-.imp-status.error  {background:rgba(255,51,85,.1);border:1px solid rgba(255,51,85,.3);color:var(--red);}
-
-.imp-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
-.imp-close{position:absolute;top:14px;right:16px;color:var(--dim);cursor:pointer;font-size:1.2rem;}
-.imp-close:hover{color:white;}
-
-/* floating import btn */
-.float-import{
-  position:fixed;bottom:28px;right:28px;z-index:500;
-  padding:12px 20px;background:linear-gradient(135deg,#00d4ff,#0099cc);
-  color:#000;font-weight:700;border:none;border-radius:12px;
-  cursor:pointer;font-size:.88rem;font-family:'Rajdhani',sans-serif;
-  box-shadow:0 4px 20px rgba(0,212,255,.35);
-  transition:transform .15s,box-shadow .15s;
-}
-.float-import:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(0,212,255,.5);}
-.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,212,255,.3);border-top-color:var(--cyan);border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:middle;}
-@keyframes spin{to{transform:rotate(360deg);}}
+/* ── EXCEL MODAL ── */
+.xl-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;align-items:center;justify-content:center;}
+.xl-ov.open{display:flex;}
+.xl-box{background:#13131f;border:1px solid var(--green);border-radius:14px;width:92%;max-width:500px;padding:26px;position:relative;}
+.xl-title{font-family:'Orbitron',sans-serif;font-size:.88rem;color:var(--green);letter-spacing:.1em;margin-bottom:4px;}
+.xl-sub{font-size:.76rem;color:var(--dim);margin-bottom:16px;line-height:1.5;}
+.xl-close{position:absolute;top:14px;right:16px;color:var(--dim);cursor:pointer;font-size:1.2rem;}
+.xl-close:hover{color:white;}
+.xl-drop{border:2px dashed rgba(0,232,122,.4);border-radius:10px;padding:26px 20px;text-align:center;cursor:pointer;background:rgba(0,232,122,.04);transition:all .2s;position:relative;margin-bottom:14px;}
+.xl-drop:hover,.xl-drop.on{border-color:var(--green);background:rgba(0,232,122,.1);}
+.xl-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.xl-fname{color:var(--green);font-weight:700;font-size:.82rem;margin-top:6px;display:none;}
+.xl-radios{display:flex;gap:10px;margin-bottom:14px;}
+.xl-radio{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;padding:9px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.1);font-size:.82rem;font-weight:700;transition:all .15s;user-select:none;}
+.xl-radio.core{border-color:var(--gold);background:rgba(245,200,66,.1);color:var(--gold);}
+.xl-radio.new {border-color:var(--green);background:rgba(0,232,122,.1);color:var(--green);}
+.xl-status{padding:9px 13px;border-radius:8px;font-size:.82rem;font-weight:600;margin-bottom:10px;display:none;}
+.xl-status.ok {background:rgba(0,232,122,.1);border:1px solid rgba(0,232,122,.3);color:var(--green);}
+.xl-status.err{background:rgba(255,51,85,.1) ;border:1px solid rgba(255,51,85,.3) ;color:var(--red);}
+.xl-btns{display:flex;gap:10px;justify-content:space-between;margin-top:4px;align-items:center;}
+.xl-tmpl{font-size:.76rem;color:var(--cyan);cursor:pointer;text-decoration:underline;}
+.xl-tmpl:hover{color:white;}
+.float-xl{position:fixed;bottom:28px;right:28px;z-index:500;padding:11px 20px;background:linear-gradient(135deg,#00e87a,#009944);color:#000;font-weight:700;border:none;border-radius:12px;cursor:pointer;font-size:.88rem;font-family:'Rajdhani',sans-serif;box-shadow:0 4px 20px rgba(0,232,122,.35);transition:transform .15s,box-shadow .15s;}
+.float-xl:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(0,232,122,.5);}
 
 /* ═══════════════ CREDITS ═══════════════ */
 .credits-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px 28px;text-align:center;min-width:200px;}
@@ -451,54 +418,31 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;fo
 
 </div><!-- /#pageBody -->
 
-<!-- FLOATING IMPORT BUTTON -->
-<button class="float-import" onclick="openImport()">🤖 AI Import Team</button>
+<button class="float-xl" onclick="openXl()">📊 Import Excel</button>
 
-<!-- IMPORT MODAL -->
-<div class="imp-ov" id="impModal">
-  <div class="imp-box">
-    <span class="imp-close" onclick="closeImport()">✕</span>
-    <div class="imp-title">🤖 AI IMPORT — AUTO FILL TEAM</div>
-
-    <div class="imp-tabs">
-      <button class="imp-tab active" onclick="switchTab('img')">📷 Screenshot</button>
-      <button class="imp-tab" onclick="switchTab('txt')">📋 Paste Teks</button>
+<div class="xl-ov" id="xlModal">
+  <div class="xl-box">
+    <span class="xl-close" onclick="closeXl()">✕</span>
+    <div class="xl-title">📊 IMPORT DARI EXCEL / CSV</div>
+    <div class="xl-sub">Upload file Excel → pilih target → Import. Team otomatis dibuat dengan semua box-nya.</div>
+    <div class="xl-drop" id="xlDrop">
+      <input type="file" accept=".xlsx,.xls,.csv" id="xlFile" onchange="handleXlFile(this)">
+      <div style="font-size:2rem;margin-bottom:6px">📂</div>
+      <div style="color:var(--dim);font-size:.82rem"><b style="color:var(--green)">Klik atau drag & drop</b> file Excel / CSV</div>
+      <div class="xl-fname" id="xlFname"></div>
     </div>
-
-    <!-- TAB: IMAGE -->
-    <div class="imp-tab-content active" id="tabImg">
-      <div class="drop-zone" id="dropZone">
-        <input type="file" accept="image/*" id="imgFileInput" onchange="handleImgFile(this)">
-        <div class="dz-icon">🖼️</div>
-        <div class="dz-text">
-          <b style="color:var(--cyan)">Klik atau drag & drop</b> screenshot team kamu<br>
-          <span style="font-size:.75rem">AI akan baca otomatis & isi semua slot unit + binding</span>
-        </div>
-        <img class="dz-preview" id="dzPreview" alt="preview">
+    <div style="font-size:.75rem;color:var(--dim);margin-bottom:10px;">Masukkan ke:</div>
+    <div class="xl-radios">
+      <div class="xl-radio" id="rCore" onclick="setTarget('core')">🏆 Core Team</div>
+      <div class="xl-radio" id="rNew"  onclick="setTarget('new')">🔰 New Team</div>
+    </div>
+    <div class="xl-status" id="xlStatus"></div>
+    <div class="xl-btns">
+      <span class="xl-tmpl" onclick="downloadTemplate()">⬇ Download Template</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-cancel" onclick="closeXl()">Batal</button>
+        <button class="btn btn-apply" onclick="doImport()">🚀 Import Sekarang</button>
       </div>
-    </div>
-
-    <!-- TAB: TEXT -->
-    <div class="imp-tab-content" id="tabTxt">
-      <textarea class="imp-textarea" id="pasteArea" placeholder="Paste data team di sini. Contoh format:
-
-TEAM 1 | 130+ Floors Push
-1. Awakened Eclipseborn Hawk | Binding Vow
-2. Merged Beast | Fallen Knight
-3. Healing Fist | Binding Light
-4. Divine Emperor | Binding Vow
-
-TEAM 2 | Best Dungeon Team
-1. Cosmic Villain | Binding Vow
-..."></textarea>
-      <div class="imp-hint">Format bebas — AI akan otomatis parse nama unit & binding dari teks yang kamu paste.</div>
-    </div>
-
-    <div class="imp-status" id="impStatus"></div>
-
-    <div class="imp-btns">
-      <button class="btn btn-cancel" onclick="closeImport()">Batal</button>
-      <button class="btn btn-apply" id="impRunBtn" onclick="runImport()">🚀 Proses Sekarang</button>
     </div>
   </div>
 </div>
@@ -995,230 +939,211 @@ const NEW_TEAMS=[
             {name:'Divine Emperor',bind:'Binding Vow'},{name:'Sacred Arch Priestess',bind:'Binding Vow'}]},
 ];
 
-/* ═══════════════════════════════════════════════
-   MODIFIER PRIORITY — EDITABLE PILLS
-═══════════════════════════════════════════════ */
-function createMpPill(text, colorClass) {
-  const pill = document.createElement('span');
-  pill.className = `mp-pill ${colorClass}`;
-  pill.contentEditable = true;
-  pill.innerHTML = `${text}<span class="delete-pill" contenteditable="false"> ✕</span>`;
-  pill.querySelector('.delete-pill').addEventListener('click', e => {
+/* ═══════════════ MP PILLS EDITABLE ═══════════════ */
+function createMpPill(text,cls){
+  const p=document.createElement('span');p.className=`mp-pill ${cls}`;p.contentEditable=true;
+  p.innerHTML=`${text}<span class="delete-pill" contenteditable="false"> ✕</span>`;
+  p.querySelector('.delete-pill').addEventListener('click',e=>{
     e.stopPropagation();
-    const next = pill.nextSibling;
-    const prev = pill.previousSibling;
-    if(next && next.classList && next.classList.contains('mp-arrow')) next.remove();
-    else if(prev && prev.classList && prev.classList.contains('mp-arrow')) prev.remove();
-    pill.remove();
+    const nx=p.nextSibling,pv=p.previousSibling;
+    if(nx&&nx.classList&&nx.classList.contains('mp-arrow'))nx.remove();
+    else if(pv&&pv.classList&&pv.classList.contains('mp-arrow'))pv.remove();
+    p.remove();
   });
-  return pill;
+  return p;
 }
-function addMpArrow() {
-  const a = document.createElement('span'); a.className='mp-arrow'; a.textContent=' › '; return a;
+function mkArrow(){const a=document.createElement('span');a.className='mp-arrow';a.textContent=' › ';return a;}
+function addNewMpPill(){
+  const chain=document.getElementById('mpChain');
+  const cls=['red','gold','cyan','orange','purple','gray'];
+  if(chain.children.length>0)chain.appendChild(mkArrow());
+  const p=createMpPill('New Modifier',cls[Math.floor(Math.random()*cls.length)]);
+  chain.appendChild(p);p.focus();
 }
-function addNewMpPill() {
-  const chain = document.getElementById('mpChain');
-  const colors = ['red','gold','cyan','orange','purple','gray'];
-  const rc = colors[Math.floor(Math.random()*colors.length)];
-  if(chain.children.length>0) chain.appendChild(addMpArrow());
-  const p = createMpPill('New Modifier', rc);
-  chain.appendChild(p);
-  const range=document.createRange(); const sel=window.getSelection();
-  range.setStart(p,0); range.collapse(true); sel.removeAllRanges(); sel.addRange(range); p.focus();
-}
-function initMpChain() {
-  const chain = document.getElementById('mpChain'); chain.innerHTML='';
-  const pills=[{text:'Dmg Reduction',class:'red'},{text:'HP Buff',class:'gold'},
-               {text:'Luck',class:'cyan'},{text:'Damage',class:'orange'},
-               {text:'High Roller',class:'purple'},{text:'Other',class:'gray'}];
-  pills.forEach((p,i)=>{ if(i>0) chain.appendChild(addMpArrow()); chain.appendChild(createMpPill(p.text,p.class)); });
+function initMpChain(){
+  const chain=document.getElementById('mpChain');chain.innerHTML='';
+  [{t:'Dmg Reduction',c:'red'},{t:'HP Buff',c:'gold'},{t:'Luck',c:'cyan'},
+   {t:'Damage',c:'orange'},{t:'High Roller',c:'purple'},{t:'Other',c:'gray'}]
+  .forEach((x,i)=>{if(i>0)chain.appendChild(mkArrow());chain.appendChild(createMpPill(x.t,x.c));});
 }
 
-/* ═══════════════════════════════════════════════
-   AI IMPORT — IMAGE + TEXT
-═══════════════════════════════════════════════ */
-let impTab = 'img';
-let impImgB64 = null;
-let impImgMime = 'image/png';
+/* ═══════════════ EXCEL IMPORT ═══════════════ */
+let xlData=null, xlTarget='core';
 
-function openImport(){ document.getElementById('impModal').classList.add('open'); resetImport(); }
-function closeImport(){ document.getElementById('impModal').classList.remove('open'); }
-
-function switchTab(t){
-  impTab=t;
-  document.querySelectorAll('.imp-tab').forEach((b,i)=>b.classList.toggle('active',['img','txt'][i]===t));
-  document.getElementById('tabImg').classList.toggle('active', t==='img');
-  document.getElementById('tabTxt').classList.toggle('active', t==='txt');
-  setImpStatus('','');
+function openXl(){document.getElementById('xlModal').classList.add('open');resetXl();}
+function closeXl(){document.getElementById('xlModal').classList.remove('open');}
+function setTarget(t){
+  xlTarget=t;
+  document.getElementById('rCore').className='xl-radio'+(t==='core'?' core':'');
+  document.getElementById('rNew') .className='xl-radio'+(t==='new' ?' new' :'');
+}
+function resetXl(){
+  xlData=null;
+  document.getElementById('xlFname').style.display='none';
+  document.getElementById('xlStatus').style.display='none';
+  setTarget('core');
 }
 
-function resetImport(){
-  impImgB64=null; impImgMime='image/png';
-  document.getElementById('dzPreview').style.display='none';
-  document.getElementById('dzPreview').src='';
-  document.getElementById('pasteArea').value='';
-  setImpStatus('','');
-  switchTab('img');
-}
-
-function handleImgFile(input){
-  if(!input.files||!input.files[0]) return;
-  const file=input.files[0];
-  impImgMime=file.type||'image/png';
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const dataUrl=e.target.result;
-    impImgB64=dataUrl.split(',')[1];
-    const prev=document.getElementById('dzPreview');
-    prev.src=dataUrl; prev.style.display='block';
-  };
-  reader.readAsDataURL(file);
-}
-
-// drag over drop zone
-const dz=document.getElementById('dropZone');
-dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('dragover');});
-dz.addEventListener('dragleave',()=>dz.classList.remove('dragover'));
-dz.addEventListener('drop',e=>{
-  e.preventDefault(); dz.classList.remove('dragover');
+const xlDrop=document.getElementById('xlDrop');
+xlDrop.addEventListener('dragover',e=>{e.preventDefault();xlDrop.classList.add('on');});
+xlDrop.addEventListener('dragleave',()=>xlDrop.classList.remove('on'));
+xlDrop.addEventListener('drop',e=>{
+  e.preventDefault();xlDrop.classList.remove('on');
   const f=e.dataTransfer.files[0];
-  if(f&&f.type.startsWith('image/')){
-    const inp=document.getElementById('imgFileInput');
-    const dt=new DataTransfer(); dt.items.add(f); inp.files=dt.files;
-    handleImgFile(inp);
-  }
+  if(f){const inp=document.getElementById('xlFile');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;handleXlFile(inp);}
 });
 
-function setImpStatus(type,msg){
-  const el=document.getElementById('impStatus');
-  el.className='imp-status'+(type?' '+type:'');
-  el.style.display=type?'block':'none';
-  el.innerHTML=msg;
+function handleXlFile(inp){
+  if(!inp.files||!inp.files[0])return;
+  const file=inp.files[0];
+  document.getElementById('xlFname').textContent='📄 '+file.name;
+  document.getElementById('xlFname').style.display='block';
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      xlData=parseTemplate(raw);
+      if(!xlData.length)throw new Error('Tidak ada data team ditemukan.');
+      showXlStatus('ok',`✅ ${xlData.length} team siap diimport.`);
+    }catch(err){showXlStatus('err','❌ '+err.message);xlData=null;}
+  };
+  reader.readAsArrayBuffer(file);
 }
 
-async function runImport(){
-  if(impTab==='img' && !impImgB64){ alert('Pilih screenshot dulu!'); return; }
-  if(impTab==='txt' && !document.getElementById('pasteArea').value.trim()){ alert('Paste data teks dulu!'); return; }
+/*
+  FORMAT EXCEL (kolom A, 1 kolom):
+  Team 1          ← nama team (baris pertama setelah kosong / awal)
+  Floor 130       ← deskripsi
+  1.Unit,Binding  ← member (diawali angka)
+  require         ← keyword → baris berikutnya masuk Require Box
+  isi require
+  tips            ← keyword → baris berikutnya masuk Tips Box
+  isi tips
+  warning         ← keyword → baris berikutnya masuk Warning Box
+  isi warning
+                  ← baris kosong = team berikutnya
+*/
+function parseTemplate(rows){
+  const KEYWORDS={
+    require:'require', required:'require',
+    tips:'tips', tip:'tips',
+    warning:'warning', warn:'warning', danger:'warning'
+  };
+  const teams=[];
+  let cur=null, section=null;
 
-  const btn=document.getElementById('impRunBtn');
-  btn.disabled=true;
-  setImpStatus('loading','<span class="spinner"></span> AI sedang membaca data team...');
+  const flush=()=>{if(cur&&cur.title)teams.push(cur);};
 
-  try{
-    let messages;
-    const sysPrompt = `You are a game team composition reader. Extract team data from the input and return ONLY valid JSON, no explanation, no markdown.
+  for(let i=0;i<rows.length;i++){
+    const cell=String(rows[i][0]||rows[i][1]||'').trim();
 
-Return format:
-{
-  "teams": [
-    {
-      "tag": "TEAM 1 · COLUMN 1",
-      "title": "Team name here",
-      "desc": "Short description of the team role",
-      "members": [
-        {"name": "Unit Name", "bind": "Binding ability name"}
-      ]
-    }
-  ]
-}
+    // baris kosong = team baru
+    if(!cell){flush();cur=null;section=null;continue;}
 
-Rules:
-- Extract ALL teams found
-- Each member needs name + bind (ability/passive)
-- If no binding found write "Binding Vow" as default
-- tag format: "TEAM N" or "TEAM N · COLUMN N"
-- Keep team order as found in input
-- Return ONLY the JSON object, nothing else`;
+    const low=cell.toLowerCase();
 
-    if(impTab==='img'){
-      messages=[{role:'user',content:[
-        {type:'image',source:{type:'base64',media_type:impImgMime,data:impImgB64}},
-        {type:'text',text:'Read this team composition screenshot and extract all teams with their unit names and binding abilities. Return only JSON.'}
-      ]}];
-    } else {
-      const txt=document.getElementById('pasteArea').value.trim();
-      messages=[{role:'user',content:`Parse this team composition text and extract all teams:\n\n${txt}`}];
+    // cek keyword section
+    if(KEYWORDS[low]){
+      if(cur){
+        section=KEYWORDS[low];
+        if(!cur[section])cur[section]=[];
+      }
+      continue;
     }
 
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1500,
-        system:sysPrompt,
-        messages
-      })
-    });
+    // cek member: diawali angka + titik/kurung
+    const memMatch=cell.match(/^(\d+)[.)]\s*(.+)/);
+    if(memMatch&&cur){
+      section=null;
+      const parts=memMatch[2].split(/[,|]/);
+      cur.members.push({name:(parts[0]||'').trim(),bind:(parts[1]||'Binding Vow').trim()});
+      continue;
+    }
 
-    if(!res.ok){ const err=await res.json(); throw new Error(err.error?.message||'API error'); }
+    // isi section aktif
+    if(section&&cur){cur[section].push(cell);continue;}
 
-    const data=await res.json();
-    const raw=data.content.map(c=>c.text||'').join('').trim();
-    const clean=raw.replace(/```json|```/g,'').trim();
-    const parsed=JSON.parse(clean);
-
-    if(!parsed.teams||!parsed.teams.length) throw new Error('Tidak ada data team ditemukan.');
-
-    applyImportedTeams(parsed.teams);
-    setImpStatus('success',`✅ Berhasil! ${parsed.teams.length} team diisi otomatis.`);
-    setTimeout(()=>closeImport(), 1800);
-
-  } catch(err){
-    console.error(err);
-    setImpStatus('error','❌ Gagal: '+err.message);
+    // baris biasa → team baru atau deskripsi
+    if(!cur){
+      cur={title:cell,tag:cell.toUpperCase(),desc:'',members:[],require:[],tips:[],warning:[]};
+      section=null;
+    } else if(!cur.desc){
+      cur.desc=cell;
+    }
   }
-  btn.disabled=false;
+  flush();
+  return teams;
 }
 
-function applyImportedTeams(teams){
-  const coreGrid=document.getElementById('coreGrid');
-  const newGrid=document.getElementById('newGrid');
-  const coreCards=[...coreGrid.querySelectorAll('.team-card')];
-  const newCards=[...newGrid.querySelectorAll('.team-card')];
-  const allCards=[...coreCards,...newCards];
+function showXlStatus(type,msg){
+  const el=document.getElementById('xlStatus');
+  el.className='xl-status '+type;el.style.display='block';el.textContent=msg;
+}
 
-  teams.forEach((t,i)=>{
-    if(i<allCards.length){
-      // fill existing card
-      fillCard(allCards[i], t);
-    } else {
-      // build new card and add to new grid
-      const color=TEAM_COLORS[i%TEAM_COLORS.length];
-      const card=buildCard({...t,color});
-      newGrid.appendChild(card);
+function doImport(){
+  if(!xlData||!xlData.length){showXlStatus('err','❌ Upload file dulu!');return;}
+  const grid=document.getElementById(xlTarget==='core'?'coreGrid':'newGrid');
+  xlData.forEach(t=>{
+    const color=TEAM_COLORS[colorIdx++%TEAM_COLORS.length];
+    const card=buildCard({id:'xl_'+Date.now()+Math.random(),tag:t.tag,title:t.title,desc:t.desc,color,members:t.members});
+    const fc=card.querySelector('.foot-content');
+
+    // Require box
+    if(t.require&&t.require.length){
+      const b=document.createElement('div');b.className='mod-box';
+      b.innerHTML=`<div class="mod-title" contenteditable="true">🔶 REQUIRED</div>
+        <div class="mod-list">${t.require.map(x=>`<div class="mod-item" contenteditable="true">${x}</div>`).join('')}</div>
+        <button class="add-point-btn" onclick="addPt(this)">+ Tambah Point</button>
+        <span class="delete-box" onclick="this.closest('.mod-box').remove()">✕</span>`;
+      fc.appendChild(b);
     }
+
+    // Tips box  ← INI YANG DITAMBAH, TERPISAH DARI WARNING
+    if(t.tips&&t.tips.length){
+      const b=document.createElement('div');b.className='tips-box';
+      b.innerHTML=`<div class="tips-title" contenteditable="true">💡 TIPS</div>
+        <div class="tips-list">${t.tips.map(x=>`<div class="tips-item" contenteditable="true">${x}</div>`).join('')}</div>
+        <button class="add-point-btn" onclick="addTp(this)">+ Tambah Point</button>
+        <span class="delete-box" onclick="this.closest('.tips-box').remove()">✕</span>`;
+      fc.appendChild(b);
+    }
+
+    // Warning box
+    if(t.warning&&t.warning.length){
+      const w=document.createElement('div');w.className='warn-box';w.contentEditable=true;
+      w.innerHTML=`⚠ ${t.warning.join(' — ')}<span class="delete-box" onclick="this.closest('.warn-box').remove()">✕</span>`;
+      fc.appendChild(w);
+    }
+
+    grid.appendChild(card);
   });
+  showXlStatus('ok',`✅ ${xlData.length} team berhasil ditambahkan!`);
+  setTimeout(()=>closeXl(),1500);
 }
 
-function fillCard(card, t){
-  // tag, title, desc
-  const tag=card.querySelector('.card-tag'); if(tag&&t.tag) tag.textContent=t.tag;
-  const title=card.querySelector('.card-title'); if(title&&t.title) title.textContent=t.title;
-  const desc=card.querySelector('.card-desc'); if(desc&&t.desc) desc.textContent=t.desc;
-
-  // members
-  if(t.members&&t.members.length){
-    const container=card.querySelector('.card-members');
-    // clear existing members
-    container.querySelectorAll('.mem-row').forEach(r=>r.remove());
-    const color=getComputedStyle(card).getPropertyValue('--tc').trim()||'#f5c842';
-    t.members.forEach((m,i)=>{
-      const row=document.createElement('div'); row.className='mem-row';
-      row.innerHTML=`<div class="mem-num" style="color:${color}">${i+1}</div>
-        <div style="flex:1">
-          <div class="mem-name" contenteditable="true">${m.name||''}</div>
-          <div class="mem-bind" contenteditable="true">${m.bind||'Binding Vow'}</div>
-        </div>`;
-      const del=document.createElement('span');
-      del.className='delete-mem'; del.innerHTML='✕';
-      del.onclick=()=>{ row.remove(); renumMembers(container); };
-      row.appendChild(del);
-      enableMemDrag(row);
-      container.appendChild(row);
-    });
-    renumMembers(container);
-  }
+function downloadTemplate(){
+  const tmpl=[
+    ['Team 1'],['Floor 130'],
+    ['1.Divine Emperor,Demonic Gift'],['2.Awakened Eclipseborn Hawk,Binding Vow'],
+    ['3.Healing Fist,Binding Light'],['4.Merged Beast,Fallen Knight'],
+    ['require'],['Max Damage Reduction'],['Max HP Buff'],
+    ['tips'],['Gunakan di floor 140+ untuk hasil terbaik'],
+    ['warning'],['Do not use Merged Beast Secret'],
+    [''],
+    ['Team 2'],['Best Dungeon 140-190+'],
+    ['1.Cosmic Villain,Binding Vow'],['2.Awakened Eclipseborn Hawk,Binding Light'],
+    ['3.Divine Emperor,Binding Vow'],['4.Herald,Binding Vow'],
+    ['require'],['Damage Reduction 30%'],['Health Buff 50%'],
+    ['tips'],['Jika Qin pakai Vow, taruh Sacred Arch Mage di slot 2'],
+    [''],
+  ];
+  const ws=XLSX.utils.aoa_to_sheet(tmpl);
+  ws['!cols']=[{wch:45}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Teams');
+  XLSX.writeFile(wb,'Team_Template.xlsx');
 }
 
 window.onload=()=>{
@@ -1228,7 +1153,7 @@ window.onload=()=>{
   NEW_TEAMS.forEach(t=>ng.appendChild(buildCard(t)));
   colorIdx=CORE_TEAMS.length+NEW_TEAMS.length;
   initMpChain();
-  console.log('%c✅ Siap! AI Import aktif.','color:#00d4ff;font-size:14px');
+  console.log('%c✅ Siap!','color:#00e87a;font-size:14px');
 };
 </script>
 </body>
