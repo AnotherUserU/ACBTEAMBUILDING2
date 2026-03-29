@@ -211,9 +211,120 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;fo
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .toast.err{border-color:var(--red);color:var(--red);}
 @media(max-width:600px){.core-grid,.new-grid{grid-template-columns:1fr;}.card-img-right{width:90px;}}
+
+/* ═══════════ AUTH OVERLAY ═══════════ */
+#authOverlay{
+  position:fixed;inset:0;z-index:99999;
+  background:linear-gradient(135deg,#0a0a14 0%,#0f0f1f 50%,#0a0a14 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Rajdhani',sans-serif;
+  transition:opacity .4s ease;
+}
+#authOverlay.hiding{opacity:0;pointer-events:none;}
+.auth-card{
+  background:#13131f;border:1px solid rgba(245,200,66,.25);
+  border-radius:20px;padding:40px 36px 32px;
+  width:90%;max-width:380px;text-align:center;
+  box-shadow:0 0 60px rgba(245,200,66,.08), 0 20px 60px rgba(0,0,0,.6);
+  position:relative;overflow:hidden;
+}
+.auth-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,transparent,#f5c842,transparent);
+}
+.auth-lock{font-size:2.6rem;margin-bottom:12px;display:block;filter:drop-shadow(0 0 10px rgba(245,200,66,.4));}
+.auth-title{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:.18em;color:#f5c842;margin-bottom:4px;text-shadow:0 0 20px rgba(245,200,66,.35);}
+.auth-sub{font-size:.8rem;color:#6b6f8f;margin-bottom:28px;letter-spacing:.04em;}
+.auth-input-wrap{position:relative;margin-bottom:16px;}
+.auth-input{
+  width:100%;padding:13px 44px 13px 16px;
+  background:#0f0f17;border:1px solid rgba(255,255,255,.1);
+  color:white;border-radius:10px;font-size:1rem;
+  font-family:'Rajdhani',sans-serif;outline:none;
+  transition:border-color .2s, box-shadow .2s;
+  letter-spacing:.06em;
+}
+.auth-input:focus{border-color:#f5c842;box-shadow:0 0 0 3px rgba(245,200,66,.12);}
+.auth-input.error{border-color:#ff3355;box-shadow:0 0 0 3px rgba(255,51,85,.12);animation:shake .35s ease;}
+.auth-eye{
+  position:absolute;right:13px;top:50%;transform:translateY(-50%);
+  color:#6b6f8f;cursor:pointer;font-size:1rem;
+  background:none;border:none;padding:4px;
+  transition:color .15s;
+}
+.auth-eye:hover{color:#f5c842;}
+.auth-btn{
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,#f5c842,#ff8c42);color:#000;
+  border:none;border-radius:10px;font-size:1rem;font-weight:700;
+  font-family:'Orbitron',sans-serif;letter-spacing:.1em;
+  cursor:pointer;transition:transform .15s,box-shadow .15s,opacity .15s;
+  box-shadow:0 4px 20px rgba(245,200,66,.3);
+}
+.auth-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(245,200,66,.45);}
+.auth-btn:active{transform:translateY(0);}
+.auth-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;}
+.auth-err{
+  color:#ff6680;font-size:.78rem;font-weight:600;
+  margin-top:10px;min-height:18px;letter-spacing:.03em;
+}
+.auth-loading{display:inline-block;width:16px;height:16px;border:2px solid rgba(0,0,0,.3);border-top-color:#000;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+
+/* Edit mode indicator */
+#editBadge{
+  display:none;position:fixed;top:12px;right:12px;z-index:9000;
+  background:rgba(0,232,122,.15);border:1px solid rgba(0,232,122,.4);
+  color:#00e87a;border-radius:999px;padding:5px 14px;
+  font-family:'Share Tech Mono',monospace;font-size:.68rem;font-weight:700;
+  letter-spacing:.1em;cursor:pointer;
+  transition:background .15s;
+}
+#editBadge:hover{background:rgba(255,51,85,.2);border-color:rgba(255,51,85,.4);color:#ff3355;}
+#editBadge.visible{display:block;}
+
+/* Sembunyikan semua elemen edit saat bukan editor */
+body:not(.is-editor) .edit-btn,
+body:not(.is-editor) .delete-mem,
+body:not(.is-editor) .delete-team-btn,
+body:not(.is-editor) .delete-box,
+body:not(.is-editor) .add-point-btn,
+body:not(.is-editor) .card-drag-handle,
+body:not(.is-editor) .color-dot,
+body:not(.is-editor) .clr-palette,
+body:not(.is-editor) .block-handle,
+body:not(.is-editor) .cred-edit-btn,
+body:not(.is-editor) .float-xl,
+body:not(.is-editor) .save-bar,
+body:not(.is-editor) #downloadBtn { display:none !important; }
+
+body:not(.is-editor) [contenteditable] { outline:none !important; cursor:default; pointer-events:none; }
+body:not(.is-editor) .card-img-right { cursor:default; pointer-events:none; }
+body:not(.is-editor) .mem-row { cursor:default; }
+
 </style>
 </head>
 <body>
+
+<!-- ═══════════ AUTH OVERLAY ═══════════ -->
+<div id="authOverlay">
+  <div class="auth-card">
+    <span class="auth-lock">🔐</span>
+    <div class="auth-title">EDITOR ACCESS</div>
+    <div class="auth-sub">Team Composition Guide · Admin Only</div>
+    <div class="auth-input-wrap">
+      <input class="auth-input" id="authInput" type="password"
+        placeholder="Enter password..."
+        onkeydown="if(event.key==='Enter')doAuth()">
+      <button class="auth-eye" id="authEye" onclick="togglePw()" title="Show/hide">👁</button>
+    </div>
+    <button class="auth-btn" id="authBtn" onclick="doAuth()">UNLOCK EDITOR</button>
+    <div class="auth-err" id="authErr"></div>
+  </div>
+</div>
+<div id="editBadge" onclick="logoutEditor()">✏ EDIT MODE · Click to Exit</div>
+
 
 <div class="nav-header">
   <div class="nav-menu">
@@ -460,6 +571,91 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;fo
 </div>
 
 <script>
+
+/* ═══════════ AUTH SYSTEM ═══════════ */
+const AUTH_SESSION_KEY = 'ACB_EDITOR_TOKEN';
+
+function isEditor(){ return sessionStorage.getItem(AUTH_SESSION_KEY) === 'granted'; }
+
+async function doAuth(){
+  const pw   = document.getElementById('authInput').value.trim();
+  const btn  = document.getElementById('authBtn');
+  const errEl= document.getElementById('authErr');
+  const inp  = document.getElementById('authInput');
+
+  if(!pw){ errEl.textContent = 'Masukkan password dulu.'; inp.classList.add('error'); setTimeout(()=>inp.classList.remove('error'),600); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="auth-loading"></span>Checking...';
+  errEl.textContent = '';
+
+  try{
+    const res = await fetch('/api/auth', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ password: pw })
+    });
+    const data = await res.json();
+
+    if(data.ok){
+      sessionStorage.setItem(AUTH_SESSION_KEY, 'granted');
+      grantEditorAccess();
+    } else {
+      errEl.textContent = '❌ ' + (data.message || 'Password salah.');
+      inp.classList.add('error');
+      setTimeout(()=>inp.classList.remove('error'), 600);
+      btn.disabled = false;
+      btn.innerHTML = 'UNLOCK EDITOR';
+      inp.value = '';
+      inp.focus();
+    }
+  } catch(e){
+    errEl.textContent = '⚠ Gagal konek ke server. Coba lagi.';
+    btn.disabled = false;
+    btn.innerHTML = 'UNLOCK EDITOR';
+  }
+}
+
+function grantEditorAccess(){
+  const overlay = document.getElementById('authOverlay');
+  overlay.classList.add('hiding');
+  setTimeout(()=>{ overlay.style.display='none'; }, 400);
+  document.body.classList.add('is-editor');
+  document.getElementById('editBadge').classList.add('visible');
+}
+
+function logoutEditor(){
+  if(!confirm('Keluar dari Edit Mode?')) return;
+  sessionStorage.removeItem(AUTH_SESSION_KEY);
+  document.body.classList.remove('is-editor');
+  document.getElementById('editBadge').classList.remove('visible');
+  // tampilkan kembali overlay
+  const overlay = document.getElementById('authOverlay');
+  overlay.style.display = 'flex';
+  overlay.classList.remove('hiding');
+  document.getElementById('authInput').value = '';
+  document.getElementById('authErr').textContent = '';
+  document.getElementById('authBtn').disabled = false;
+  document.getElementById('authBtn').innerHTML = 'UNLOCK EDITOR';
+}
+
+function togglePw(){
+  const inp = document.getElementById('authInput');
+  const eye = document.getElementById('authEye');
+  if(inp.type === 'password'){ inp.type='text'; eye.textContent='🙈'; }
+  else { inp.type='password'; eye.textContent='👁'; }
+}
+
+// Cek session saat halaman load — kalau sudah pernah auth, bypass overlay
+function checkExistingSession(){
+  if(isEditor()){
+    grantEditorAccess();
+  } else {
+    // Fokus ke input password
+    setTimeout(()=>{ const i=document.getElementById('authInput'); if(i)i.focus(); }, 100);
+  }
+}
+
 const TEAM_COLORS=['#f5c842','#c36bff','#00d4ff','#00e87a','#ff8c42','#ff5fa0','#4488ff','#ff3355'];
 const H1_COLORS=[...TEAM_COLORS,'#ffffff','#aaccff','#ff9999','#99ffcc'];
 let colorIdx=0;
@@ -900,6 +1096,7 @@ function rewireAll(){
 }
 
 window.onload=()=>{
+  checkExistingSession();
   // try load from localStorage first
   const raw=localStorage.getItem(SAVE_KEY);
   if(raw){
