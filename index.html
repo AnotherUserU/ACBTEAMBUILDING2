@@ -8,259 +8,111 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-/* ═══════════════ ROOT ═══════════════ */
-:root {
-  --bg:#0f0f17; --bg2:#13131f; --bg3:#1a1a2e;
-  --border:rgba(255,255,255,0.07);
-  --text:#dde0f0; --dim:#6b6f8f;
-  --gold:#f5c842; --cyan:#00d4ff; --green:#00e87a;
-  --red:#ff3355; --orange:#ff8c42; --purple:#c36bff;
-  --pink:#ff5fa0; --blue:#4488ff;
-}
+:root{--bg:#0f0f17;--bg2:#13131f;--bg3:#1a1a2e;--border:rgba(255,255,255,0.07);--text:#dde0f0;--dim:#6b6f8f;--gold:#f5c842;--cyan:#00d4ff;--green:#00e87a;--red:#ff3355;--orange:#ff8c42;--purple:#c36bff;--pink:#ff5fa0;--blue:#4488ff;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:15px;line-height:1.5;}
-
-/* ═══════════════ DRAGGABLE HEADER BLOCKS ═══════════════ */
-.page-block {
-  position:relative;
-  transition:opacity .2s;
-}
-.page-block.dragging-block { opacity:.35; }
-.page-block.block-drag-over { outline:2px dashed var(--cyan); border-radius:6px; }
-
-/* drag handle shown on hover */
-.block-handle {
-  position:absolute;
-  left:-28px; top:50%;
-  transform:translateY(-50%);
-  color:var(--dim);
-  font-size:1rem;
-  cursor:grab;
-  opacity:0;
-  transition:opacity .15s;
-  user-select:none;
-  z-index:10;
-}
-.page-block:hover .block-handle { opacity:.6; }
-.block-handle:hover { opacity:1 !important; }
-
-/* wrapper so handles have room */
-#pageBody {
-  padding-left:36px;
-  padding-right:16px;
-}
-
-/* ═══════════════ TOP BAR ═══════════════ */
-.top-bar {
-  background:rgba(255,40,60,0.12);
-  border-bottom:2px solid rgba(255,40,60,0.5);
-  padding:14px 24px; text-align:center;
-  font-size:15px; color:#ff3355; font-weight:700;
-  outline:none;
-}
+/* NAV HEADER */
+.nav-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:16px 24px;text-align:center;}
+.nav-menu{display:flex;justify-content:center;gap:20px;}
+.nav-btn{padding:10px 20px;background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:16px;font-weight:600;font-family:'Orbitron',sans-serif;transition:background .2s, color .2s;}
+.nav-btn.active{background:var(--gold);color:#000;border-color:var(--gold);}
+.nav-btn:hover{background:var(--cyan);color:#000;}
+/* MODE SECTIONS */
+.mode-section{display:none;}
+.mode-section.active{display:block;}
+/* FOOTER */
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px;text-align:center;margin-top:40px;}
+.footer-nav{display:flex;justify-content:center;gap:20px;margin-bottom:16px;}
+.footer-btn{padding:12px 24px;background:linear-gradient(135deg,var(--gold),var(--orange));color:#000;border:none;border-radius:10px;cursor:pointer;font-size:16px;font-weight:700;font-family:'Orbitron',sans-serif;text-transform:uppercase;letter-spacing:.1em;box-shadow:0 4px 12px rgba(245,200,66,.4);transition:transform .2s, box-shadow .2s;}
+.footer-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(245,200,66,.6);}
+.footer-text{font-size:14px;color:var(--dim);margin-top:12px;}
+.page-block{position:relative;transition:opacity .2s;}
+.page-block.dragging-block{opacity:.35;}
+.page-block.block-drag-over{outline:2px dashed var(--cyan);border-radius:6px;}
+.block-handle{position:absolute;left:-28px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:1rem;cursor:grab;opacity:0;transition:opacity .15s;user-select:none;z-index:10;}
+.page-block:hover .block-handle{opacity:.6;}
+.block-handle:hover{opacity:1 !important;}
+#pageBody{padding-left:36px;padding-right:16px;}
+.top-bar{background:rgba(255,40,60,0.12);border-bottom:2px solid rgba(255,40,60,0.5);padding:14px 24px;text-align:center;font-size:15px;color:#ff3355;font-weight:700;outline:none;}
 .top-bar strong{color:#ff3355;font-weight:800;}
-
-/* ═══════════════ MAIN TITLE ═══════════════ */
-.main-title {
-  font-family:'Orbitron',sans-serif; font-size:2.2rem;
-  color:var(--gold); text-align:center; padding:30px 0;
-  outline:none;
-  text-shadow:0 0 30px rgba(245,200,66,.3);
-  letter-spacing:.18em;
-}
-
-/* ═══════════════ SECTION LABEL ═══════════════ */
-.section-label {
-  text-align:center; padding:30px 0 15px;
-  font-size:.85rem; letter-spacing:3px; color:var(--dim);
-  outline:none;
-}
-
-/* ═══════════════ ALERT BOX ═══════════════ */
+.main-title{font-family:'Orbitron',sans-serif;font-size:2.2rem;color:var(--gold);text-align:center;padding:30px 0;outline:none;text-shadow:0 0 30px rgba(245,200,66,.3);letter-spacing:.18em;}
+.section-label{text-align:center;padding:30px 0 15px;font-size:.85rem;letter-spacing:3px;color:var(--dim);outline:none;}
 .alert-wrap{padding:0 20px 16px;max-width:1280px;margin:0 auto;}
-.alert-box {
-  border:1.5px solid var(--red); border-radius:10px;
-  background:rgba(255,40,60,.08); padding:14px 24px;
-  text-align:center;
-  font-family:'Orbitron',sans-serif; font-size:.82rem;
-  font-weight:700; letter-spacing:.1em; color:var(--red);
-  line-height:2.2; outline:none;
-}
-
-/* ═══════════════ GRID WRAPPERS ═══════════════ */
+.alert-box{border:1.5px solid var(--red);border-radius:10px;background:rgba(255,40,60,.08);padding:14px 24px;text-align:center;font-family:'Orbitron',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.1em;color:var(--red);line-height:2.2;outline:none;}
 .grid-wrap{max-width:1280px;margin:0 auto;padding:0 20px 28px;}
 .core-grid,.new-grid{display:grid;gap:18px;}
 .core-grid{grid-template-columns:repeat(4,1fr);}
-.new-grid {grid-template-columns:repeat(2,1fr);}
+.new-grid{grid-template-columns:repeat(2,1fr);}
 .core-grid.drag-over,.new-grid.drag-over{outline:2px dashed var(--cyan);border-radius:12px;}
-
-/* ═══════════════ TEAM CARD ═══════════════ */
-/* --tc is set per card via inline style */
-.team-card{
-  border:1px solid var(--border);
-  background:var(--bg2);
-  border-radius:12px;
-  overflow:visible;        /* allow palette popup */
-  position:relative;
-  display:flex;
-  flex-direction:column;
-  transition:box-shadow .2s,transform .2s;
-}
-/* clip inner content, not the whole card */
-.team-card-inner{
-  border-radius:12px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-  flex:1;
-}
+.team-card{border:1px solid var(--border);background:var(--bg2);border-radius:12px;overflow:visible;position:relative;display:flex;flex-direction:column;transition:box-shadow .2s,transform .2s;}
+.team-card-inner{border-radius:12px;overflow:hidden;display:flex;flex-direction:column;flex:1;}
 .team-card.dragging-card{opacity:.4;transform:scale(.97);}
 .team-card.drag-over-card{box-shadow:0 0 0 2px var(--cyan) inset;}
-
-/* accent top bar – uses --tc */
-.card-accent-bar{
-  height:3px;
-  background:linear-gradient(90deg, var(--tc,#f5c842), transparent);
-  flex-shrink:0;
-}
-
-/* ═══════════════ CARD HEAD ═══════════════ */
+.card-accent-bar{height:3px;background:linear-gradient(90deg,var(--tc,#f5c842),transparent);flex-shrink:0;}
 .card-head{padding:14px 16px 10px;border-bottom:1px solid var(--border);position:relative;}
-.card-tag  {font-size:.75rem;color:var(--tc,#f5c842) !important;font-weight:600;margin-bottom:4px;outline:none;}
+.card-tag{font-size:.75rem;color:var(--tc,#f5c842) !important;font-weight:600;margin-bottom:4px;outline:none;}
 .card-title{font-family:'Orbitron',sans-serif;font-size:.95rem;font-weight:700;color:var(--tc,#f5c842) !important;outline:none;}
-.card-desc {font-size:.82rem;color:#aaa;margin-top:4px;outline:none;}
-
-/* ═══════════════ CARD BODY ═══════════════ */
+.card-desc{font-size:.82rem;color:#aaa;margin-top:4px;outline:none;}
 .card-body{display:flex;flex:1;}
 .card-members{flex:1;padding:12px;display:flex;flex-direction:column;gap:10px;}
-
 .mem-row{display:flex;gap:10px;position:relative;align-items:flex-start;cursor:grab;}
 .mem-row:active{cursor:grabbing;}
 .mem-row.dragging-mem{opacity:.35;}
 .mem-row.over-mem{box-shadow:0 -2px 0 var(--cyan);}
-
-.mem-num{
-  width:24px;height:24px;border-radius:50%;
-  background:rgba(255,255,255,.07);
-  border:1px solid rgba(255,255,255,.12);
-  display:flex;align-items:center;justify-content:center;
-  font-size:.7rem;font-weight:700;flex-shrink:0;
-  color:var(--tc,#f5c842);
-}
+.mem-num{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;color:var(--tc,#f5c842);}
 .mem-name{font-weight:700;outline:none;display:block;}
 .mem-bind{font-size:.78rem;color:#888;outline:none;display:block;}
-
-/* ═══════════════ IMAGE PANEL ═══════════════ */
-.card-img-right{
-  width:130px;background:rgba(0,0,0,.4);
-  cursor:pointer;position:relative;border-left:1px solid var(--border);
-  flex-shrink:0;
-}
+.card-img-right{width:130px;background:rgba(0,0,0,.4);cursor:pointer;position:relative;border-left:1px solid var(--border);flex-shrink:0;}
 .card-img-right img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
 .card-img-right.loaded img{display:block;}
-.img-right-overlay{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  color:#555;font-size:.72rem;text-align:center;padding:10px;pointer-events:none;gap:5px;
-}
+.img-right-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#555;font-size:.72rem;text-align:center;padding:10px;pointer-events:none;gap:5px;}
 .card-img-right.loaded .img-right-overlay{opacity:0;}
 .img-right-overlay .ov-icon{font-size:1.4rem;opacity:.35;}
-
-/* ═══════════════ CARD FOOTER BOXES ═══════════════ */
 .card-foot{padding:12px;border-top:1px solid var(--border);background:rgba(0,0,0,.25);}
-
-.mod-box,.tips-box,.warn-box,.h1-block{
-  border-radius:8px;padding:10px 13px;margin-bottom:10px;position:relative;
-}
-.mod-box {background:rgba(255,140,66,.08);border:1px solid rgba(255,140,66,.4);}
+.mod-box,.tips-box,.warn-box,.h1-block{border-radius:8px;padding:10px 13px;margin-bottom:10px;position:relative;}
+.mod-box{background:rgba(255,140,66,.08);border:1px solid rgba(255,140,66,.4);}
 .tips-box{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.4);}
 .warn-box{background:rgba(255,40,60,.08);border:1px solid rgba(255,40,60,.35);color:#ff8899;line-height:1.55;}
 .h1-block{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);}
-
-.mod-title {font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:1.5px;color:#ff8c42;margin-bottom:6px;outline:none;}
+.mod-title{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:1.5px;color:#ff8c42;margin-bottom:6px;outline:none;}
 .tips-title{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:1.5px;color:#00d4ff;margin-bottom:6px;outline:none;}
-.mod-item {font-size:.82rem;color:#a0e0c0;font-weight:600;padding:3px 0;outline:none;}
+.mod-item{font-size:.82rem;color:#a0e0c0;font-weight:600;padding:3px 0;outline:none;}
 .tips-item{font-size:.82rem;color:#a0e0ff;font-weight:600;padding:3px 0;outline:none;}
 .h1-block h1{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:900;letter-spacing:.06em;outline:none;line-height:1.4;}
-
-/* ═══════════════ EDIT CONTROLS ═══════════════ */
 .delete-box{position:absolute;top:7px;right:8px;color:var(--red);cursor:pointer;font-size:1rem;opacity:.6;}
 .delete-box:hover{opacity:1;}
 .delete-mem{position:absolute;right:0;top:4px;color:var(--red);cursor:pointer;font-size:.9rem;opacity:.55;}
 .delete-mem:hover{opacity:1;}
-.delete-team-btn{
-  position:absolute;top:8px;right:8px;
-  background:rgba(255,50,50,.85);color:white;border:none;
-  padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.72rem;z-index:20;
-}
-
-.edit-btn{
-  padding:6px 11px;
-  background:rgba(0,212,255,.1);color:var(--cyan);
-  border:1px solid rgba(0,212,255,.3);border-radius:6px;
-  cursor:pointer;margin:3px;font-size:.76rem;
-  font-family:'Rajdhani',sans-serif;
-  transition:background .15s;
-}
+.delete-team-btn{position:absolute;top:8px;right:8px;background:rgba(255,50,50,.85);color:white;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:.72rem;z-index:20;}
+.edit-btn{padding:6px 11px;background:rgba(0,212,255,.1);color:var(--cyan);border:1px solid rgba(0,212,255,.3);border-radius:6px;cursor:pointer;margin:3px;font-size:.76rem;font-family:'Rajdhani',sans-serif;transition:background .15s;}
 .edit-btn:hover{background:rgba(0,212,255,.2);}
 .add-point-btn{font-size:.72rem;color:#ff8c42;background:none;border:none;cursor:pointer;margin-top:5px;font-family:'Rajdhani',sans-serif;}
-
-/* card drag handle (top-left, inside card-inner) */
-.card-drag-handle{
-  position:absolute;top:8px;left:9px;
-  color:var(--dim);font-size:.85rem;cursor:grab;opacity:.4;z-index:15;
-  user-select:none;
-}
+.card-drag-handle{position:absolute;top:8px;left:9px;color:var(--dim);font-size:.85rem;cursor:grab;opacity:.4;z-index:15;user-select:none;}
 .card-drag-handle:hover{opacity:.9;}
-
-/* color dot */
-.color-dot{
-  position:absolute;top:16px;left:200px;
-  width:13px;height:13px;border-radius:50%;
-  border:2px solid rgba(255,255,255,.25);
-  cursor:pointer;z-index:15;
-  transition:transform .15s;
-}
+.color-dot{position:absolute;top:16px;left:200px;width:13px;height:13px;border-radius:50%;border:2px solid rgba(255,255,255,.25);cursor:pointer;z-index:15;transition:transform .15s;}
 .color-dot:hover{transform:scale(1.4);}
-
-/* color palette popup */
-.clr-palette{
-  display:none;position:absolute;top:28px;left:22px;
-  background:#1a1a2e;border:1px solid rgba(255,255,255,.12);border-radius:10px;
-  padding:10px;z-index:100;gap:7px;flex-wrap:wrap;width:148px;
-  box-shadow:0 8px 24px rgba(0,0,0,.6);
-}
+.clr-palette{display:none;position:absolute;top:28px;left:22px;background:#1a1a2e;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px;z-index:100;gap:7px;flex-wrap:wrap;width:148px;box-shadow:0 8px 24px rgba(0,0,0,.6);}
 .clr-palette.open{display:flex;}
-.cp-sw{
-  width:22px;height:22px;border-radius:50%;cursor:pointer;
-  border:2px solid transparent;transition:transform .15s,border-color .15s;
-}
+.cp-sw{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;}
 .cp-sw:hover{transform:scale(1.3);border-color:white;}
-
-/* ═══════════════ WATERMARK ═══════════════ */
 .watermark{position:absolute;bottom:13px;right:13px;color:rgba(255,255,255,.2);font-size:.82rem;font-weight:600;pointer-events:none;z-index:5;}
 
-/* ═══════════════ MODIFIER PRIORITY ═══════════════ */
-.mod-priority{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 22px;}
-.mp-title{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--dim);margin-bottom:13px;}
+/* MODIFIER PRIORITY — hanya chain + tombol tambah */
+.mod-priority{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px 22px;min-height:72px;}
 .mp-chain{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px;}
-.mp-pill{padding:5px 15px;border-radius:999px;font-weight:700;font-size:.8rem;border:1.5px solid;}
-.mp-pill.red   {color:var(--red);   border-color:rgba(255,51,85,.45); background:rgba(255,51,85,.07);}
-.mp-pill.gold  {color:var(--gold);  border-color:rgba(245,200,66,.45);background:rgba(245,200,66,.07);}
-.mp-pill.cyan  {color:var(--cyan);  border-color:rgba(0,212,255,.45); background:rgba(0,212,255,.07);}
+.mp-pill{padding:5px 15px;border-radius:999px;font-weight:700;font-size:.8rem;border:1.5px solid;cursor:text;min-width:85px;text-align:center;outline:none;transition:transform .15s;}
+.mp-pill:hover{transform:scale(1.04);}
+.mp-pill.red{color:var(--red);border-color:rgba(255,51,85,.45);background:rgba(255,51,85,.07);}
+.mp-pill.gold{color:var(--gold);border-color:rgba(245,200,66,.45);background:rgba(245,200,66,.07);}
+.mp-pill.cyan{color:var(--cyan);border-color:rgba(0,212,255,.45);background:rgba(0,212,255,.07);}
 .mp-pill.orange{color:var(--orange);border-color:rgba(255,140,66,.45);background:rgba(255,140,66,.07);}
 .mp-pill.purple{color:var(--purple);border-color:rgba(195,107,255,.45);background:rgba(195,107,255,.07);}
-.mp-pill.gray  {color:var(--dim);   border-color:rgba(107,111,143,.45);background:rgba(107,111,143,.07);}
+.mp-pill.gray{color:var(--dim);border-color:rgba(107,111,143,.45);background:rgba(107,111,143,.07);}
 .mp-arrow{color:var(--dim);}
-.mp-note{font-size:.76rem;color:var(--dim);font-style:italic;}
-
-/* ── MP PILL EDITABLE ── */
-.mp-pill{cursor:text;min-width:85px;text-align:center;outline:none;transition:transform .15s;}
-.mp-pill:hover{transform:scale(1.04);}
 .delete-pill{margin-left:8px;cursor:pointer;opacity:.55;font-size:.75em;}
 .delete-pill:hover{opacity:1;color:#ff3355;}
 
-/* ── EXCEL MODAL ── */
+/* EXCEL */
 .xl-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;align-items:center;justify-content:center;}
 .xl-ov.open{display:flex;}
 .xl-box{background:#13131f;border:1px solid var(--green);border-radius:14px;width:92%;max-width:500px;padding:26px;position:relative;}
@@ -275,25 +127,28 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;fo
 .xl-radios{display:flex;gap:10px;margin-bottom:14px;}
 .xl-radio{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;padding:9px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.1);font-size:.82rem;font-weight:700;transition:all .15s;user-select:none;}
 .xl-radio.core{border-color:var(--gold);background:rgba(245,200,66,.1);color:var(--gold);}
-.xl-radio.new {border-color:var(--green);background:rgba(0,232,122,.1);color:var(--green);}
+.xl-radio.new{border-color:var(--green);background:rgba(0,232,122,.1);color:var(--green);}
 .xl-status{padding:9px 13px;border-radius:8px;font-size:.82rem;font-weight:600;margin-bottom:10px;display:none;}
-.xl-status.ok {background:rgba(0,232,122,.1);border:1px solid rgba(0,232,122,.3);color:var(--green);}
-.xl-status.err{background:rgba(255,51,85,.1) ;border:1px solid rgba(255,51,85,.3) ;color:var(--red);}
+.xl-status.ok{background:rgba(0,232,122,.1);border:1px solid rgba(0,232,122,.3);color:var(--green);}
+.xl-status.err{background:rgba(255,51,85,.1);border:1px solid rgba(255,51,85,.3);color:var(--red);}
 .xl-btns{display:flex;gap:10px;justify-content:space-between;margin-top:4px;align-items:center;}
 .xl-tmpl{font-size:.76rem;color:var(--cyan);cursor:pointer;text-decoration:underline;}
 .xl-tmpl:hover{color:white;}
 .float-xl{position:fixed;bottom:28px;right:28px;z-index:500;padding:11px 20px;background:linear-gradient(135deg,#00e87a,#009944);color:#000;font-weight:700;border:none;border-radius:12px;cursor:pointer;font-size:.88rem;font-family:'Rajdhani',sans-serif;box-shadow:0 4px 20px rgba(0,232,122,.35);transition:transform .15s,box-shadow .15s;}
 .float-xl:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(0,232,122,.5);}
 
-/* ═══════════════ CREDITS ═══════════════ */
+/* CREDITS BOX */
 .credits-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px 28px;text-align:center;min-width:200px;}
-.cred-lbl {font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.2em;color:var(--dim);margin-bottom:5px;}
-.cred-name{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:700;color:var(--gold);text-shadow:0 0 14px rgba(245,200,66,.38);margin-bottom:14px;outline:none;}
-.help-lbl {font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.15em;color:var(--dim);margin-bottom:7px;}
-.help-list{display:flex;flex-direction:column;gap:5px;}
-.helper{font-size:.86rem;font-weight:600;color:var(--text);outline:none;}
+.cred-lbl{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.2em;color:var(--dim);margin-bottom:5px;}
+.cred-name{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:700;color:var(--gold);text-shadow:0 0 14px rgba(245,200,66,.38);margin-bottom:14px;}
+.cred-locked-row{display:flex;align-items:center;gap:6px;margin-bottom:14px;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.2);border-radius:8px;padding:8px 12px;}
+.cred-lock-icon{font-size:.8rem;flex-shrink:0;opacity:.7;}
+.cred-locked-row .cred-lbl{margin-bottom:0;font-size:.55rem;text-align:left;}
+.cred-locked-row .cred-name{margin-bottom:0;font-size:.88rem;text-align:left;}
+.cred-edit-btn{display:block;width:100%;margin-top:14px;padding:7px 0;background:rgba(245,200,66,.12);color:var(--gold);border:1px solid rgba(245,200,66,.35);border-radius:8px;cursor:pointer;font-size:.76rem;font-weight:700;font-family:'Rajdhani',sans-serif;letter-spacing:.05em;transition:background .15s;}
+.cred-edit-btn:hover{background:rgba(245,200,66,.22);}
 
-/* ═══════════════ MODAL ═══════════════ */
+/* MODAL IMAGE / H1 */
 .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;}
 .modal-ov.open{display:flex;}
 .modal-box{background:#1a1a2e;padding:26px;border-radius:12px;width:90%;max-width:420px;border:1px solid var(--cyan);}
@@ -302,467 +157,153 @@ body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;fo
 .modal-btns{text-align:right;margin-top:16px;display:flex;gap:10px;justify-content:flex-end;}
 .btn{padding:9px 20px;border-radius:6px;border:none;font-weight:600;cursor:pointer;font-size:.9rem;}
 .btn-cancel{background:#333;color:white;}
-.btn-apply {background:var(--cyan);color:#000;}
-
-/* h1 color swatches */
+.btn-apply{background:var(--cyan);color:#000;}
 .h1-swatch{width:26px;height:26px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;}
 .h1-swatch:hover,.h1-swatch.sel{transform:scale(1.2);border-color:white;}
 
-/* ═══════════════ RESPONSIVE ═══════════════ */
-@media(max-width:1000px){.core-grid{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:600px) {.core-grid,.new-grid{grid-template-columns:1fr;}.card-img-right{width:90px;}}
+/* CREDITS MODAL */
+.cred-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 16px;}
+.cred-ov.open{display:flex;}
+.cred-modal-box{background:#13131f;border:1px solid var(--gold);border-radius:16px;width:92%;max-width:560px;padding:28px 28px 22px;position:relative;overflow-y:auto;max-height:90vh;}
+.cred-modal-title{font-family:'Orbitron',sans-serif;font-size:.9rem;color:var(--gold);letter-spacing:.12em;margin-bottom:4px;}
+.cred-modal-sub{font-size:.76rem;color:var(--dim);margin-bottom:20px;line-height:1.6;}
+.cred-close{position:absolute;top:14px;right:16px;color:var(--dim);cursor:pointer;font-size:1.2rem;}
+.cred-close:hover{color:white;}
+.cred-locked-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.25);border-radius:9px;margin-bottom:18px;}
+.cred-locked-banner .lock-txt{font-size:.78rem;color:var(--gold);font-weight:700;}
+.cred-locked-banner .lock-sub{font-size:.7rem;color:var(--dim);}
+.cred-sec-block{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:13px 14px;margin-bottom:10px;position:relative;}
+.cred-sec-block .sec-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.cred-sec-block .sec-label-input{flex:1;padding:7px 10px;background:#0f0f17;border:1px solid rgba(255,255,255,.12);color:white;border-radius:7px;font-size:.78rem;font-family:'Share Tech Mono',monospace;letter-spacing:.1em;outline:none;text-transform:uppercase;transition:border-color .15s;}
+.cred-sec-block .sec-label-input:focus{border-color:var(--gold);}
+.cred-sec-block .sec-color-dot{width:22px;height:22px;border-radius:50%;cursor:pointer;flex-shrink:0;border:2px solid rgba(255,255,255,.2);transition:transform .15s;position:relative;}
+.cred-sec-block .sec-color-dot:hover{transform:scale(1.2);}
+.sec-color-palette{display:none;position:absolute;top:30px;right:0;background:#1a1a2e;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px;z-index:200;gap:7px;flex-wrap:wrap;width:160px;box-shadow:0 8px 24px rgba(0,0,0,.7);}
+.sec-color-palette.open{display:flex;}
+.sec-cp-sw{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s,border-color .15s;flex-shrink:0;}
+.sec-cp-sw:hover{transform:scale(1.25);border-color:white;}
+.sec-cp-custom{width:22px;height:22px;border:none;border-radius:50%;cursor:pointer;padding:0;background:none;flex-shrink:0;}
+.sec-rm-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:.95rem;opacity:.55;padding:3px 5px;line-height:1;flex-shrink:0;}
+.sec-rm-btn:hover{opacity:1;}
+.cred-field-row{display:flex;gap:7px;margin-bottom:7px;align-items:center;}
+.cred-field-row input{flex:1;padding:8px 11px;background:#0f0f17;border:1px solid rgba(255,255,255,.1);color:white;border-radius:7px;font-size:.83rem;outline:none;font-family:'Rajdhani',sans-serif;transition:border-color .15s;}
+.cred-field-row input:focus{border-color:var(--gold);}
+.cred-rm-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:.9rem;opacity:.5;padding:3px;line-height:1;flex-shrink:0;}
+.cred-rm-btn:hover{opacity:1;}
+.cred-add-name-btn{background:none;border:1px dashed rgba(255,255,255,.12);color:var(--dim);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:.74rem;font-family:'Rajdhani',sans-serif;width:100%;transition:all .15s;margin-top:3px;}
+.cred-add-name-btn:hover{border-color:var(--gold);color:var(--gold);}
+.cred-add-section-btn{background:none;border:1px dashed rgba(0,212,255,.3);color:var(--cyan);border-radius:8px;padding:9px 14px;cursor:pointer;font-size:.78rem;font-weight:700;font-family:'Rajdhani',sans-serif;width:100%;transition:all .15s;margin-bottom:16px;letter-spacing:.05em;}
+.cred-add-section-btn:hover{border-color:var(--cyan);background:rgba(0,212,255,.07);}
+.cred-apply-row{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06);}
+.cred-apply-row .btn{font-family:'Rajdhani',sans-serif;}
+
+/* SAVE LOCAL */
+.save-bar{max-width:1280px;margin:0 auto;padding:0 20px 18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.save-btn{padding:9px 18px;border-radius:8px;border:none;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;transition:all .15s;}
+.save-btn.green{background:linear-gradient(135deg,#00e87a,#009944);color:#000;box-shadow:0 3px 12px rgba(0,232,122,.3);}
+.save-btn.green:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(0,232,122,.45);}
+.save-btn.red{background:rgba(255,51,85,.15);color:var(--red);border:1px solid rgba(255,51,85,.35);}
+.save-btn.red:hover{background:rgba(255,51,85,.25);}
+.save-btn.gray{background:rgba(255,255,255,.07);color:var(--dim);border:1px solid rgba(255,255,255,.1);}
+.save-btn.gray:hover{background:rgba(255,255,255,.12);color:var(--text);}
+.save-status{font-size:.76rem;color:var(--dim);margin-left:4px;}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#13131f;border:1px solid var(--green);color:var(--green);padding:10px 22px;border-radius:10px;font-weight:700;font-size:.85rem;opacity:0;transition:all .3s;z-index:9999;pointer-events:none;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.err{border-color:var(--red);color:var(--red);}
+@media(max-width:600px){.core-grid,.new-grid{grid-template-columns:1fr;}.card-img-right{width:90px;}}
 </style>
 </head>
 <body>
 
-<!-- ═══ DRAGGABLE PAGE BODY ═══ -->
+<div class="nav-header">
+  <div class="nav-menu">
+    <button class="nav-btn active" onclick="switchMode('dungeon')">DUNGEON</button>
+    <button class="nav-btn" onclick="switchMode('story')">STORY</button>
+  </div>
+</div>
+
 <div id="pageBody">
 
-  <!-- ① TOP BAR -->
-  <div class="page-block" data-block="topbar">
-    <span class="block-handle" title="Drag to reorder">⠿⠿</span>
-    <div class="top-bar" contenteditable="true">
-      ⚠ <strong>If you don't have RB or Secret — use Gold or Basic and upgrade as you get the higher borders.</strong>
-      Must have <strong>RB Divine Emp</strong> by Floors 120–140 or <strong><u>run is chalked.</u></strong>
+  <div class="mode-section active" id="dungeonSection">
+
+    <div class="page-block" data-block="title">
+      <span class="block-handle" title="Drag to reorder">⠿⠿</span>
+      <div class="main-title" contenteditable="true">TEAM COMPOSITION GUIDE</div>
     </div>
-  </div>
 
-  <!-- ② MAIN TITLE -->
-  <div class="page-block" data-block="title">
-    <span class="block-handle" title="Drag to reorder">⠿⠿</span>
-    <div class="main-title" contenteditable="true">TEAM COMPOSITION GUIDE</div>
-  </div>
-
-  <!-- ③ ALERT BOX -->
-  <div class="page-block" data-block="alert">
-    <span class="block-handle" title="Drag to reorder">⠿⠿</span>
-    <div class="alert-wrap">
-      <div class="alert-box" contenteditable="true">
-        🚫 &nbsp;DO NOT USE SEC MERGED BEAST<br>
-        ONLY RB MERGED BEAST — NO EXCEPTIONS
-      </div>
-    </div>
-  </div>
-
-  <!-- ④ CORE TEAMS LABEL -->
-  <div class="page-block" data-block="core-label">
-    <span class="block-handle" title="Drag to reorder">⠿⠿</span>
-    <div class="section-label" contenteditable="true">CORE TEAMS</div>
-  </div>
-
-  <!-- ⑤ CORE TEAMS GRID -->
-  <div class="page-block" data-block="core-grid">
-    <span class="block-handle" title="Drag to reorder">⠿⠿</span>
-    <div class="grid-wrap">
-      <div class="core-grid" id="coreGrid"></div>
-    </div>
-    <div style="text-align:center;margin:4px 0 18px">
-      <button class="edit-btn" onclick="addNewCoreTeam()">➕ Tambah Team Core</button>
-    </div>
-  </div>
-
-  <!-- ⑥ NEW TEAMS LABEL -->
-  <div class="page-block" data-block="new-label">
-    <span class="block-handle" title="Drag to reorder">⠿⠿</span>
-    <div class="section-label" contenteditable="true">🟢 NEW TEAMS</div>
-  </div>
-
-  <!-- ⑦ NEW TEAMS GRID -->
-  <div class="page-block" data-block="new-grid">
-    <span class="block-handle" title="Drag to reorder">⠿⠿</span>
-    <div class="grid-wrap">
-      <div class="new-grid" id="newGrid"></div>
-    </div>
-    <div style="text-align:center;margin:4px 0 18px">
-      <button class="edit-btn" onclick="addNewTeam()">➕ Tambah Team Baru</button>
-    </div>
-  </div>
-
-  <!-- ⑧ MODIFIER PRIORITY + CREDITS -->
-  <div class="page-block" data-block="bottom">
-    <span class="block-handle" title="Drag to reorder">⠿⠿</span>
-    <div style="max-width:1280px;margin:0 auto;padding:0 20px 24px;display:grid;grid-template-columns:1fr 220px;gap:18px;align-items:start">
-      <div class="mod-priority">
-        <div class="mp-title">🔢 MODIFIER PRIORITY ORDER</div>
-        <div class="mp-chain" id="mpChain"></div>
-        <button class="edit-btn" onclick="addNewMpPill()" style="margin-top:4px;margin-bottom:10px;">➕ Tambah Modifier</button>
-        <p class="mp-note">Always stack survival modifiers before offensive or utility stats.</p>
-      </div>
-      <div class="credits-box">
-        <div class="cred-lbl">Design by</div>
-        <div class="cred-name" contenteditable="true">AnotherUseru</div>
-        <div class="cred-lbl">Guided by</div>
-        <div class="cred-name" contenteditable="true">Qin Shi huang</div>
-        <div class="cred-lbl" style="margin-top:6px">TEAM 1–4 CREATOR</div>
-        <div class="cred-name" style="font-size:.88rem;margin-bottom:10px" contenteditable="true">Dark</div>
-        <div class="cred-name" style="font-size:.88rem;margin-bottom:10px" contenteditable="true">NekoTsunaa</div>
-        <div class="help-lbl">HELPERS</div>
-        <div class="help-list">
-          <span class="helper" contenteditable="true">King_Li9on</span>
-          <span class="helper" contenteditable="true">Bead</span>
-          <span class="helper" contenteditable="true">Neumasd/AnotherUseru</span>
+    <div class="page-block" data-block="alert">
+      <span class="block-handle" title="Drag to reorder">⠿⠿</span>
+      <div class="alert-wrap">
+        <div class="alert-box" contenteditable="true">
+          🚫 &nbsp;DO NOT USE SEC MERGED BEAST<br>
+          ONLY RB MERGED BEAST — NO EXCEPTIONS
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ⑨ DOWNLOAD BUTTON -->
-  <div class="page-block" data-block="download">
-    <span class="block-handle" title="Drag to reorder">⠿⠿</span>
-    <div style="text-align:center;padding:10px 0 50px">
-      <button onclick="downloadAsImage()" style="padding:12px 28px;background:#00d4ff;color:#000;font-weight:700;border:none;border-radius:8px;font-size:1rem;cursor:pointer;">
-        📥 Download as Image (Clean)
-      </button>
+    <div class="page-block" data-block="core-label">
+      <span class="block-handle" title="Drag to reorder">⠿⠿</span>
+      <div class="section-label" contenteditable="true">CORE TEAMS</div>
     </div>
-  </div>
 
-</div><!-- /#pageBody -->
-
-<button class="float-xl" onclick="openXl()">📊 Import Excel</button>
-
-<div class="xl-ov" id="xlModal">
-  <div class="xl-box">
-    <span class="xl-close" onclick="closeXl()">✕</span>
-    <div class="xl-title">📊 IMPORT DARI EXCEL / CSV</div>
-    <div class="xl-sub">Upload file Excel → pilih target → Import. Team otomatis dibuat dengan semua box-nya.</div>
-    <div class="xl-drop" id="xlDrop">
-      <input type="file" accept=".xlsx,.xls,.csv" id="xlFile" onchange="handleXlFile(this)">
-      <div style="font-size:2rem;margin-bottom:6px">📂</div>
-      <div style="color:var(--dim);font-size:.82rem"><b style="color:var(--green)">Klik atau drag & drop</b> file Excel / CSV</div>
-      <div class="xl-fname" id="xlFname"></div>
+    <div class="page-block" data-block="core-grid">
+      <span class="block-handle" title="Drag to reorder">⠿⠿</span>
+      <div class="grid-wrap">
+        <div class="core-grid" id="coreGrid"></div>
+      </div>
+      <div style="text-align:center;margin:4px 0 18px">
+        <button class="edit-btn" onclick="addNewCoreTeam()">➕ Add Core Team</button>
+      </div>
     </div>
-    <div style="font-size:.75rem;color:var(--dim);margin-bottom:10px;">Masukkan ke:</div>
-    <div class="xl-radios">
-      <div class="xl-radio" id="rCore" onclick="setTarget('core')">🏆 Core Team</div>
-      <div class="xl-radio" id="rNew"  onclick="setTarget('new')">🔰 New Team</div>
+
+    <div class="page-block" data-block="new-label">
+      <span class="block-handle" title="Drag to reorder">⠿⠿</span>
+      <div class="section-label" contenteditable="true">🟢 NEW TEAMS</div>
     </div>
-    <div class="xl-status" id="xlStatus"></div>
-    <div class="xl-btns">
-      <span class="xl-tmpl" onclick="downloadTemplate()">⬇ Download Template</span>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-cancel" onclick="closeXl()">Batal</button>
-        <button class="btn btn-apply" onclick="doImport()">🚀 Import Sekarang</button>
+
+    <div class="page-block" data-block="new-grid">
+      <span class="block-handle" title="Drag to reorder">⠿⠿</span>
+      <div class="grid-wrap">
+        <div class="new-grid" id="newGrid"></div>
+      </div>
+      <div style="text-align:center;margin:4px 0 18px">
+        <button class="edit-btn" onclick="addNewTeam()">➕ Add New Team</button>
       </div>
     </div>
   </div>
-</div>
 
-<!-- ═══ MODAL: image URL ═══ -->
-<div class="modal-ov" id="modal">
-  <div class="modal-box">
-    <div class="modal-title">🖼 Masukkan Link Gambar</div>
-    <input class="modal-input" id="modalInput" type="text" placeholder="https://i.imgur.com/abc123.png">
-    <div class="modal-btns">
-      <button class="btn btn-cancel" onclick="closeModal()">Batal</button>
-      <button class="btn btn-apply"  onclick="applyImg()">Terapkan</button>
+  <div class="mode-section" id="storySection">
+
+    <div class="page-block" data-block="story-title">
+      <span class="block-handle" title="Drag to reorder">⠿⠿</span>
+      <div class="main-title" contenteditable="true">STORY MODE GUIDE</div>
     </div>
-  </div>
-</div>
 
-<!-- ═══ MODAL: H1 heading ═══ -->
-<div class="modal-ov" id="h1Modal">
-  <div class="modal-box" style="max-width:370px">
-    <div class="modal-title">✏️ Tambah Heading</div>
-    <input class="modal-input" id="h1Text" type="text" placeholder="Tulis teks heading...">
-    <div style="font-size:.75rem;color:var(--dim);margin:12px 0 8px;font-family:'Share Tech Mono',monospace;letter-spacing:.08em">PILIH WARNA</div>
-    <div id="h1ColorGrid" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px"></div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <span style="font-size:.78rem;color:var(--dim)">Custom:</span>
-      <input type="color" id="h1Custom" value="#f5c842" style="width:46px;height:26px;border:none;border-radius:6px;cursor:pointer;background:none">
-    </div>
-    <div class="modal-btns">
-      <button class="btn btn-cancel" onclick="closeH1Modal()">Batal</button>
-      <button class="btn btn-apply"  onclick="applyH1()">Tambah</button>
-    </div>
-  </div>
-</div>
 
-<script>
-/* ═══════════════════════════════════════════════
-   PALETTE
-═══════════════════════════════════════════════ */
-const TEAM_COLORS = [
-  '#f5c842', // gold
-  '#c36bff', // purple
-  '#00d4ff', // cyan
-  '#00e87a', // green
-  '#ff8c42', // orange
-  '#ff5fa0', // pink
-  '#4488ff', // blue
-  '#ff3355', // red
-];
-const H1_COLORS = [...TEAM_COLORS, '#ffffff','#aaccff','#ff9999','#99ffcc'];
-let colorIdx = 0;
-function nextColor(){ return TEAM_COLORS[colorIdx++ % TEAM_COLORS.length]; }
 
-/* ═══════════════════════════════════════════════
-   IMAGE MODAL
-═══════════════════════════════════════════════ */
-let activeImgId = null;
-function openModal(id){
-  activeImgId = id;
-  document.getElementById('modalInput').value = '';
-  document.getElementById('modal').classList.add('open');
-  setTimeout(()=>document.getElementById('modalInput').focus(),60);
-}
-function closeModal(){ document.getElementById('modal').classList.remove('open'); activeImgId=null; }
-function applyImg(){
-  if(!activeImgId) return closeModal();
-  const url = document.getElementById('modalInput').value.trim();
-  if(!url){ alert('Masukkan link gambar!'); return; }
-  const panel = document.getElementById('panel-'+activeImgId);
-  if(panel){
-    let img = panel.querySelector('img');
-    if(!img){ img=document.createElement('img'); panel.appendChild(img); }
-    img.src = url;
-    img.onerror = ()=>alert('Gambar gagal dimuat. Cek link-nya.');
-    panel.classList.add('loaded');
-  }
-  closeModal();
-}
-document.getElementById('modalInput').addEventListener('keydown',e=>{
-  if(e.key==='Enter') applyImg();
-  if(e.key==='Escape') closeModal();
-});
 
-/* ═══════════════════════════════════════════════
-   H1 MODAL
-═══════════════════════════════════════════════ */
-let activeH1Btn = null;
-let h1Color = '#f5c842';
-function buildH1Grid(){
-  const g = document.getElementById('h1ColorGrid');
-  g.innerHTML='';
-  H1_COLORS.forEach(c=>{
-    const s=document.createElement('div');
-    s.className='h1-swatch'+(c===h1Color?' sel':'');
-    s.style.background=c;
-    s.onclick=()=>{
-      h1Color=c;
-      document.getElementById('h1Custom').value=c;
-      g.querySelectorAll('.h1-swatch').forEach(x=>x.classList.remove('sel'));
-      s.classList.add('sel');
-    };
-    g.appendChild(s);
-  });
-}
-document.getElementById('h1Custom').addEventListener('input',e=>{
-  h1Color=e.target.value;
-  document.getElementById('h1ColorGrid').querySelectorAll('.h1-swatch').forEach(x=>x.classList.remove('sel'));
-});
-function openH1Modal(btn){
-  activeH1Btn=btn;
-  h1Color='#f5c842';
-  document.getElementById('h1Text').value='';
-  buildH1Grid();
-  document.getElementById('h1Modal').classList.add('open');
-  setTimeout(()=>document.getElementById('h1Text').focus(),60);
-}
-function closeH1Modal(){ document.getElementById('h1Modal').classList.remove('open'); activeH1Btn=null; }
-function applyH1(){
-  const text = document.getElementById('h1Text').value.trim()||'Heading';
-  const c = h1Color;
-  const block=document.createElement('div');
-  block.className='h1-block';
-  block.innerHTML=`<h1 contenteditable="true" style="color:${c};text-shadow:0 0 14px ${c}66">${text}</h1>
-    <span class="delete-box" onclick="this.closest('.h1-block').remove()">✕</span>`;
-  if(activeH1Btn){
-    activeH1Btn.closest('.card-foot').querySelector('.foot-content').appendChild(block);
-  }
-  closeH1Modal();
-}
-document.getElementById('h1Text').addEventListener('keydown',e=>{
-  if(e.key==='Enter'){e.preventDefault();applyH1();}
-  if(e.key==='Escape') closeH1Modal();
-});
 
-/* ═══════════════════════════════════════════════
-   COLOR PICKER PER CARD
-═══════════════════════════════════════════════ */
-function makeColorPalette(card, initColor){
-  const pal = document.createElement('div');
-  pal.className='clr-palette';
-  TEAM_COLORS.forEach(c=>{
-    const s=document.createElement('div');
-    s.className='cp-sw'; s.style.background=c; s.title=c;
-    s.onclick=e=>{e.stopPropagation();setCardColor(card,c);pal.classList.remove('open');};
-    pal.appendChild(s);
-  });
-  const ci=document.createElement('input');
-  ci.type='color'; ci.value=initColor||'#f5c842';
-  ci.style.cssText='width:22px;height:22px;border:none;border-radius:50%;cursor:pointer;padding:0;background:none;';
-  ci.title='Custom';
-  ci.addEventListener('input',e=>{setCardColor(card,e.target.value);pal.classList.remove('open');});
-  pal.appendChild(ci);
-  return pal;
-}
-function setCardColor(card, color){
-  card.style.setProperty('--tc', color);
-  const dot = card.querySelector('.color-dot');
-  if(dot) dot.style.background = color;
-  /* force re-render for elements using var(--tc) that may be cached */
-  card.querySelectorAll('.card-tag,.card-title,.mem-num').forEach(el=>{
-    el.style.color = color;
-  });
-  card.querySelector('.card-accent-bar').style.background =
-    `linear-gradient(90deg,${color},transparent)`;
-}
 
-/* ═══════════════════════════════════════════════
-   DRAG & DROP – page-level blocks
-═══════════════════════════════════════════════ */
-let dragBlock = null;
-document.querySelectorAll('.block-handle').forEach(h=>{
-  const block = h.closest('.page-block');
-  h.addEventListener('mousedown',()=>{ block.setAttribute('draggable','true'); });
-  block.addEventListener('dragstart',e=>{
-    dragBlock=block; block.classList.add('dragging-block');
-    e.dataTransfer.effectAllowed='move';
-    e.stopPropagation();
-  });
-  block.addEventListener('dragend',()=>{
-    block.setAttribute('draggable','false');
-    block.classList.remove('dragging-block');
-    document.querySelectorAll('.block-drag-over').forEach(b=>b.classList.remove('block-drag-over'));
-    dragBlock=null;
-  });
-});
-document.getElementById('pageBody').addEventListener('dragover',e=>{
-  e.preventDefault();
-  const target = e.target.closest('.page-block');
-  if(!target||target===dragBlock) return;
-  document.querySelectorAll('.block-drag-over').forEach(b=>b.classList.remove('block-drag-over'));
-  target.classList.add('block-drag-over');
-});
-document.getElementById('pageBody').addEventListener('drop',e=>{
-  e.preventDefault();
-  const target = e.target.closest('.page-block');
-  document.querySelectorAll('.block-drag-over').forEach(b=>b.classList.remove('block-drag-over'));
-  if(!target||target===dragBlock||!dragBlock) return;
-  const pb = document.getElementById('pageBody');
-  const blocks=[...pb.querySelectorAll(':scope > .page-block')];
-  const tIdx = blocks.indexOf(target);
-  pb.insertBefore(dragBlock, blocks[tIdx]);
-});
-
-/* ═══════════════════════════════════════════════
-   DRAG & DROP – cards within/between grids
-═══════════════════════════════════════════════ */
-let dragCard = null;
-function enableCardDrag(card){
-  card.setAttribute('draggable','true');
-  card.addEventListener('dragstart',e=>{
-    // only if handle initiated it
-    dragCard=card; card.classList.add('dragging-card');
-    e.dataTransfer.effectAllowed='move';
-    e.stopPropagation();
-  });
-  card.addEventListener('dragend',()=>{
-    card.classList.remove('dragging-card');
-    document.querySelectorAll('.drag-over-card').forEach(c=>c.classList.remove('drag-over-card'));
-    document.querySelectorAll('.core-grid,.new-grid').forEach(g=>g.classList.remove('drag-over'));
-    dragCard=null;
-  });
-  card.addEventListener('dragover',e=>{
-    e.preventDefault(); e.stopPropagation();
-    if(dragCard&&dragCard!==card) card.classList.add('drag-over-card');
-  });
-  card.addEventListener('dragleave',()=>card.classList.remove('drag-over-card'));
-  card.addEventListener('drop',e=>{
-    e.preventDefault(); e.stopPropagation();
-    card.classList.remove('drag-over-card');
-    if(dragCard&&dragCard!==card){
-      const dg=card.parentNode;
-      const cards=[...dg.children];
-      dg.insertBefore(dragCard, cards[cards.indexOf(card)]);
-    }
-  });
-}
-document.querySelectorAll('.core-grid,.new-grid').forEach(grid=>{
-  grid.addEventListener('dragover',e=>{e.preventDefault();grid.classList.add('drag-over');});
-  grid.addEventListener('dragleave',()=>grid.classList.remove('drag-over'));
-  grid.addEventListener('drop',e=>{
-    e.preventDefault(); grid.classList.remove('drag-over');
-    if(dragCard&&dragCard.parentNode!==grid) grid.appendChild(dragCard);
-  });
-});
-
-/* ═══════════════════════════════════════════════
-   DRAG & DROP – members inside card
-═══════════════════════════════════════════════ */
-let dragMem = null;
-function enableMemDrag(row){
-  row.setAttribute('draggable','true');
-  row.addEventListener('dragstart',e=>{
-    dragMem=row; row.classList.add('dragging-mem');
-    e.stopPropagation(); e.dataTransfer.effectAllowed='move';
-  });
-  row.addEventListener('dragend',()=>{
-    row.classList.remove('dragging-mem');
-    document.querySelectorAll('.over-mem').forEach(r=>r.classList.remove('over-mem'));
-    dragMem=null;
-  });
-  row.addEventListener('dragover',e=>{
-    e.preventDefault(); e.stopPropagation();
-    if(dragMem&&dragMem!==row) row.classList.add('over-mem');
-  });
-  row.addEventListener('dragleave',()=>row.classList.remove('over-mem'));
-  row.addEventListener('drop',e=>{
-    e.preventDefault(); e.stopPropagation();
-    row.classList.remove('over-mem');
-    if(dragMem&&dragMem!==row){
-      const c=row.parentNode;
-      const rows=[...c.querySelectorAll('.mem-row')];
-      c.insertBefore(dragMem, rows[rows.indexOf(row)]);
-      renumMembers(c);
-    }
-  });
-}
-function renumMembers(container){
-  container.querySelectorAll('.mem-row').forEach((r,i)=>{
-    const n=r.querySelector('.mem-num');
-    if(n) n.textContent=i+1;
-  });
-}
-
-/* ═══════════════════════════════════════════════
-   BUILD CARD
-═══════════════════════════════════════════════ */
-function buildCard(t){
-  const color = t.color || nextColor();
-  const id    = t.id    || 'card_'+Date.now();
-
-  const card = document.createElement('div');
-  card.className = 'team-card';
-  card.style.setProperty('--tc', color);
-
-  card.innerHTML = `
+    <div class="page-block" data-block="story-new-grid">
+      <span class="block-handle" title="Drag to reorder">⠿⠿</span>
+      <div class="grid-wrap">
+        <div class="new-grid" id="storyNewGrid"><div class="team-card" draggable="true" style="--tc: #f5c842; font-size: 16px;">
     <div class="card-drag-handle" title="Drag card">⠿⠿</div>
-    <div class="color-dot" style="background:${color}" title="Ganti warna"></div>
+    <div class="color-dot" style="background:#f5c842" title="Change color"></div>
     <div class="team-card-inner">
-      <div class="card-accent-bar" style="background:linear-gradient(90deg,${color},transparent)"></div>
+      <div class="card-accent-bar" style="background:linear-gradient(90deg,#f5c842,transparent)"></div>
       <div class="card-head">
-        <div class="card-tag"   contenteditable="true" style="color:${color}">${t.tag   ||'TEAM TAG'}</div>
-        <div class="card-title" contenteditable="true" style="color:${color}">${t.title ||'Team Name'}</div>
-        <div class="card-desc"  contenteditable="true">${t.desc  ||'Klik untuk mengedit...'}</div>
+        <div class="card-tag" contenteditable="true" style="color:#f5c842">STORY TEAM 1</div>
+        <div class="card-title" contenteditable="true" style="color:#f5c842">Story Progression Team</div>
+        <div class="card-desc" contenteditable="true">Best for advancing through story chapters.</div>
       </div>
       <div class="card-body">
         <div class="card-members">
-          ${(t.members||[]).map((m,i)=>`
-            <div class="mem-row" draggable="true">
-              <div class="mem-num" style="color:${color}">${i+1}</div>
-              <div style="flex:1">
-                <div class="mem-name" contenteditable="true">${m.name}</div>
-                <div class="mem-bind" contenteditable="true">${m.bind}</div>
-              </div>
-            </div>`).join('')}
+          <div class="mem-row" draggable="true"><div class="mem-num" style="color:#f5c842">1</div><div style="flex:1"><div class="mem-name" contenteditable="true">Awakened Eclipseborn Hawk</div><div class="mem-bind" contenteditable="true">Binding Vow</div></div><span class="delete-mem">✕</span></div><div class="mem-row" draggable="true"><div class="mem-num" style="color:#f5c842">2</div><div style="flex:1"><div class="mem-name" contenteditable="true">Merged Beast</div><div class="mem-bind" contenteditable="true">Fallen Knight</div></div><span class="delete-mem">✕</span></div><div class="mem-row" draggable="true"><div class="mem-num" style="color:#f5c842">3</div><div style="flex:1"><div class="mem-name" contenteditable="true">Healing Fist</div><div class="mem-bind" contenteditable="true">Binding Light</div></div><span class="delete-mem">✕</span></div><div class="mem-row" draggable="true"><div class="mem-num" style="color:#f5c842">4</div><div style="flex:1"><div class="mem-name" contenteditable="true">Divine Emperor</div><div class="mem-bind" contenteditable="true">Binding Vow</div></div><span class="delete-mem">✕</span></div>
         </div>
-        <div class="card-img-right" id="panel-${id}" onclick="openModal('${id}')">
+        <div class="card-img-right" id="panel-st1" onclick="openModal('st1')">
           <img src="" alt="">
-          <div class="img-right-overlay">
-            <div class="ov-icon">🖼</div>
-            <div>Click to add image</div>
-          </div>
+          <div class="img-right-overlay"><div class="ov-icon">🖼</div><div>Click to add image</div></div>
         </div>
       </div>
       <div class="card-foot">
@@ -776,176 +317,361 @@ function buildCard(t){
         </div>
       </div>
     </div>
-    <button class="delete-team-btn" onclick="this.closest('.team-card').remove()">🗑 Hapus</button>
-  `;
+    <button class="delete-team-btn" onclick="this.closest('.team-card').remove()">🗑 Delete</button><div class="clr-palette"><div class="cp-sw" title="#f5c842" style="background: rgb(245, 200, 66);"></div><div class="cp-sw" title="#c36bff" style="background: rgb(195, 107, 255);"></div><div class="cp-sw" title="#00d4ff" style="background: rgb(0, 212, 255);"></div><div class="cp-sw" title="#00e87a" style="background: rgb(0, 232, 122);"></div><div class="cp-sw" title="#ff8c42" style="background: rgb(255, 140, 66);"></div><div class="cp-sw" title="#ff5fa0" style="background: rgb(255, 95, 160);"></div><div class="cp-sw" title="#4488ff" style="background: rgb(68, 136, 255);"></div><div class="cp-sw" title="#ff3355" style="background: rgb(255, 51, 85);"></div><input type="color" title="Custom" style="width: 22px; height: 22px; border: none; border-radius: 50%; cursor: pointer; padding: 0px; background: none;"></div></div></div>
+      </div>
+      <div style="text-align:center;margin:4px 0 18px">
+        <button class="edit-btn" onclick="addNewStoryTeam()">➕ Add Story New Team</button>
+      </div>
+    </div>
 
-  /* member drag + delete */
-  card.querySelectorAll('.mem-row').forEach(row=>{
-    enableMemDrag(row);
-    const del=document.createElement('span');
-    del.className='delete-mem'; del.innerHTML='✕';
-    del.onclick=()=>{ row.remove(); renumMembers(row.closest('.card-members')); };
-    row.appendChild(del);
-  });
 
-  /* color palette */
-  const dot = card.querySelector('.color-dot');
-  const pal = makeColorPalette(card, color);
-  card.appendChild(pal);
-  dot.addEventListener('click',e=>{
-    e.stopPropagation(); pal.classList.toggle('open');
+  </div>
+
+  <!-- MODIFIER PRIORITY + CREDITS -->
+  <div class="page-block" data-block="bottom">
+    <span class="block-handle" title="Drag to reorder">⠿⠿</span>
+    <div style="max-width:1280px;margin:0 auto;padding:0 20px 24px;display:grid;grid-template-columns:1fr 220px;gap:18px;align-items:start">
+      <!-- Modifier: chain kosong + tombol tambah saja -->
+      <div class="mod-priority">
+        <div class="mp-chain" id="mpChain"></div>
+        <button class="edit-btn" onclick="addNewMpPill()" style="margin-top:4px;margin-bottom:4px;">➕ Add Modifier</button>
+      </div>
+      <!-- Credits -->
+      <div class="credits-box" id="creditsBox">
+        <div class="cred-locked-row" style="justify-content:center;width:fit-content;margin:0 auto 10px;">
+          <span class="cred-lock-icon"></span>
+          <div style="text-align:center;">
+            <div class="cred-lbl">Design by</div>
+            <div class="cred-name" style="margin-bottom:0">AnotherUseru</div>
+          </div>
+        </div>
+        <div id="credSectionsDisplay"></div>
+        <button class="cred-edit-btn" onclick="openCredModal()"> Edit Credits</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAVE TO LOCAL -->
+  <div class="page-block" data-block="save-local">
+    <span class="block-handle" title="Drag to reorder">⠿⠿</span>
+    <div class="save-bar">
+      <button class="save-btn green" onclick="saveLocal()">💾 Save to Local</button>
+      <button class="save-btn gray"  onclick="loadLocal()">📂 Load Saved</button>
+      <button class="save-btn red"   onclick="deleteLocal()">🗑 Delete Local Save</button>
+      <span class="save-status" id="saveStatus"></span>
+    </div>
+  </div>
+
+  <div class="page-block" data-block="download">
+    <span class="block-handle" title="Drag to reorder">⠿⠿</span>
+    <div style="text-align:center;padding:10px 0 50px">
+      <button id="downloadBtn" onclick="downloadAsImage()" style="padding:12px 28px;background:#00d4ff;color:#000;font-weight:700;border:none;border-radius:8px;font-size:1rem;cursor:pointer;">
+        📥 Download as Image (Clean)
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<button class="float-xl" onclick="openXl()">📊 Import Excel</button>
+
+<!-- CREDITS MODAL -->
+<div class="cred-ov" id="credModal">
+  <div class="cred-modal-box">
+    <span class="cred-close" onclick="closeCredModal()">✕</span>
+    <div class="cred-modal-title"> EDIT CREDITS</div>
+    <div class="cred-modal-sub"><br>
+       </div>
+    <div class="cred-locked-banner">
+      <span style="font-size:1.1rem"></span>
+      <div>
+        <div class="lock-txt">Design by AnotherUseru</div>
+        <div class="lock-sub">This section is locked and always displayed.</div>
+      </div>
+    </div>
+    <div id="cf-sections-list"></div>
+    <button class="cred-add-section-btn" onclick="credAddSection()">➕ Add New Section</button>
+    <div class="cred-apply-row">
+      <button class="btn btn-cancel" onclick="closeCredModal()">Cancel</button>
+      <button class="btn btn-apply" onclick="applyCredits()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXCEL MODAL -->
+<div class="xl-ov" id="xlModal">
+  <div class="xl-box">
+    <span class="xl-close" onclick="closeXl()">✕</span>
+    <div class="xl-title">📊 IMPORT FROM EXCEL / CSV</div>
+    <div class="xl-sub">Upload an Excel file → select target → Import. Teams will be automatically created with all their boxes.</div>
+    <div class="xl-drop" id="xlDrop">
+      <input type="file" accept=".xlsx,.xls,.csv" id="xlFile" onchange="handleXlFile(this)">
+      <div style="font-size:2rem;margin-bottom:6px">📂</div>
+      <div style="color:var(--dim);font-size:.82rem"><b style="color:var(--green)">Click or drag & drop</b> Excel / CSV file</div>
+      <div class="xl-fname" id="xlFname"></div>
+    </div>
+    <div style="font-size:.75rem;color:var(--dim);margin-bottom:10px;">Target:</div>
+    <div class="xl-radios">
+      <div class="xl-radio" id="rCore" onclick="setTarget('core')">🏆 Core Team</div>
+      <div class="xl-radio" id="rNew" onclick="setTarget('new')">🔰 New Team</div>
+      <div class="xl-radio" id="rStoryCore" onclick="setTarget('story-core')">📖 Story Core</div>
+      <div class="xl-radio" id="rStoryNew" onclick="setTarget('story-new')">📖 Story New</div>
+    </div>
+    <div class="xl-status" id="xlStatus"></div>
+    <div class="xl-btns">
+      <span class="xl-tmpl" onclick="downloadTemplate()">⬇ Download Template</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-cancel" onclick="closeXl()">Cancel</button>
+        <button class="btn btn-apply" onclick="doImport()">🚀 Import Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE MODAL -->
+<div class="modal-ov" id="modal">
+  <div class="modal-box">
+    <div class="modal-title">🖼 Enter Image Link</div>
+    <input class="modal-input" id="modalInput" type="text" placeholder="https://i.imgur.com/abc123.png">
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-apply" onclick="applyImg()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- H1 MODAL -->
+<div class="modal-ov" id="h1Modal">
+  <div class="modal-box" style="max-width:370px">
+    <div class="modal-title"> Add Heading</div>
+    <input class="modal-input" id="h1Text" type="text" placeholder="Enter heading text...">
+    <div style="font-size:.75rem;color:var(--dim);margin:12px 0 8px;font-family:'Share Tech Mono',monospace;letter-spacing:.08em">SELECT COLOR</div>
+    <div id="h1ColorGrid" style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <span style="font-size:.78rem;color:var(--dim)">Custom:</span>
+      <input type="color" id="h1Custom" value="#f5c842" style="width:46px;height:26px;border:none;border-radius:6px;cursor:pointer;background:none">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-cancel" onclick="closeH1Modal()">Cancel</button>
+      <button class="btn btn-apply" onclick="applyH1()">Add</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TEAM_COLORS=['#f5c842','#c36bff','#00d4ff','#00e87a','#ff8c42','#ff5fa0','#4488ff','#ff3355'];
+const H1_COLORS=[...TEAM_COLORS,'#ffffff','#aaccff','#ff9999','#99ffcc'];
+let colorIdx=0;
+function nextColor(){return TEAM_COLORS[colorIdx++%TEAM_COLORS.length];}
+
+/* NAVIGATION */
+function switchMode(mode){
+  document.querySelectorAll('.mode-section').forEach(sec=>sec.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(btn=>btn.classList.remove('active'));
+  if(mode==='dungeon'){
+    document.getElementById('dungeonSection').classList.add('active');
+    document.querySelector('.nav-btn:nth-child(1)').classList.add('active');
+  }else if(mode==='story'){
+    document.getElementById('storySection').classList.add('active');
+    document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
+  }
+}
+
+/* IMAGE MODAL */
+let activeImgId=null;
+function openModal(id){activeImgId=id;document.getElementById('modalInput').value='';document.getElementById('modal').classList.add('open');setTimeout(()=>document.getElementById('modalInput').focus(),60);}
+function closeModal(){document.getElementById('modal').classList.remove('open');activeImgId=null;}
+function applyImg(){
+  if(!activeImgId)return closeModal();
+  const url=document.getElementById('modalInput').value.trim();
+  if(!url){alert('Enter image link!');return;}
+  const panel=document.getElementById('panel-'+activeImgId);
+  if(panel){let img=panel.querySelector('img');if(!img){img=document.createElement('img');panel.appendChild(img);}img.src=url;img.onerror=()=>alert('Image failed to load. Check the link.');panel.classList.add('loaded');}
+  closeModal();
+}
+document.getElementById('modalInput').addEventListener('keydown',e=>{if(e.key==='Enter')applyImg();if(e.key==='Escape')closeModal();});
+
+/* H1 MODAL */
+let activeH1Btn=null,h1Color='#f5c842';
+function buildH1Grid(){
+  const g=document.getElementById('h1ColorGrid');g.innerHTML='';
+  H1_COLORS.forEach(c=>{
+    const s=document.createElement('div');s.className='h1-swatch'+(c===h1Color?' sel':'');s.style.background=c;
+    s.onclick=()=>{h1Color=c;document.getElementById('h1Custom').value=c;g.querySelectorAll('.h1-swatch').forEach(x=>x.classList.remove('sel'));s.classList.add('sel');};
+    g.appendChild(s);
   });
+}
+document.getElementById('h1Custom').addEventListener('input',e=>{h1Color=e.target.value;document.getElementById('h1ColorGrid').querySelectorAll('.h1-swatch').forEach(x=>x.classList.remove('sel'));});
+function openH1Modal(btn){activeH1Btn=btn;h1Color='#f5c842';document.getElementById('h1Text').value='';buildH1Grid();document.getElementById('h1Modal').classList.add('open');setTimeout(()=>document.getElementById('h1Text').focus(),60);}
+function closeH1Modal(){document.getElementById('h1Modal').classList.remove('open');activeH1Btn=null;}
+function applyH1(){
+  const text=document.getElementById('h1Text').value.trim()||'Heading';const c=h1Color;
+  const block=document.createElement('div');block.className='h1-block';
+  block.innerHTML=`<h1 contenteditable="true" style="color:${c};text-shadow:0 0 14px ${c}66">${text}</h1><span class="delete-box" onclick="this.closest('.h1-block').remove()">✕</span>`;
+  if(activeH1Btn){activeH1Btn.closest('.card-foot').querySelector('.foot-content').appendChild(block);}
+  closeH1Modal();
+}
+document.getElementById('h1Text').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();applyH1();}if(e.key==='Escape')closeH1Modal();});
+
+/* COLOR PALETTE PER CARD */
+function makeColorPalette(card,initColor){
+  const pal=document.createElement('div');pal.className='clr-palette';
+  TEAM_COLORS.forEach(c=>{const s=document.createElement('div');s.className='cp-sw';s.style.background=c;s.title=c;s.onclick=e=>{e.stopPropagation();setCardColor(card,c);pal.classList.remove('open');};pal.appendChild(s);});
+  const ci=document.createElement('input');ci.type='color';ci.value=initColor||'#f5c842';ci.style.cssText='width:22px;height:22px;border:none;border-radius:50%;cursor:pointer;padding:0;background:none;';ci.title='Custom';ci.addEventListener('input',e=>{setCardColor(card,e.target.value);pal.classList.remove('open');});pal.appendChild(ci);
+  return pal;
+}
+function setCardColor(card,color){
+  card.style.setProperty('--tc',color);const dot=card.querySelector('.color-dot');if(dot)dot.style.background=color;
+  card.querySelectorAll('.card-tag,.card-title,.mem-num').forEach(el=>{el.style.color=color;});
+  card.querySelector('.card-accent-bar').style.background=`linear-gradient(90deg,${color},transparent)`;
+}
+
+/* DRAG - page blocks */
+let dragBlock=null;
+document.querySelectorAll('.block-handle').forEach(h=>{
+  const block=h.closest('.page-block');
+  h.addEventListener('mousedown',()=>{block.setAttribute('draggable','true');});
+  block.addEventListener('dragstart',e=>{dragBlock=block;block.classList.add('dragging-block');e.dataTransfer.effectAllowed='move';e.stopPropagation();});
+  block.addEventListener('dragend',()=>{block.setAttribute('draggable','false');block.classList.remove('dragging-block');document.querySelectorAll('.block-drag-over').forEach(b=>b.classList.remove('block-drag-over'));dragBlock=null;});
+});
+document.getElementById('pageBody').addEventListener('dragover',e=>{e.preventDefault();const target=e.target.closest('.page-block');if(!target||target===dragBlock)return;document.querySelectorAll('.block-drag-over').forEach(b=>b.classList.remove('block-drag-over'));target.classList.add('block-drag-over');});
+document.getElementById('pageBody').addEventListener('drop',e=>{e.preventDefault();const target=e.target.closest('.page-block');document.querySelectorAll('.block-drag-over').forEach(b=>b.classList.remove('block-drag-over'));if(!target||target===dragBlock||!dragBlock)return;const pb=document.getElementById('pageBody');const blocks=[...pb.querySelectorAll(':scope > .page-block')];pb.insertBefore(dragBlock,blocks[blocks.indexOf(target)]);});
+
+/* DRAG - cards */
+let dragCard=null;
+function enableCardDrag(card){
+  card.setAttribute('draggable','true');
+  card.addEventListener('dragstart',e=>{dragCard=card;card.classList.add('dragging-card');e.dataTransfer.effectAllowed='move';e.stopPropagation();});
+  card.addEventListener('dragend',()=>{card.classList.remove('dragging-card');document.querySelectorAll('.drag-over-card').forEach(c=>c.classList.remove('drag-over-card'));document.querySelectorAll('.core-grid,.new-grid').forEach(g=>g.classList.remove('drag-over'));dragCard=null;});
+  card.addEventListener('dragover',e=>{e.preventDefault();e.stopPropagation();if(dragCard&&dragCard!==card)card.classList.add('drag-over-card');});
+  card.addEventListener('dragleave',()=>card.classList.remove('drag-over-card'));
+  card.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();card.classList.remove('drag-over-card');if(dragCard&&dragCard!==card){const dg=card.parentNode;const cards=[...dg.children];dg.insertBefore(dragCard,cards[cards.indexOf(card)]);}});
+}
+document.querySelectorAll('.core-grid,.new-grid').forEach(grid=>{
+  grid.addEventListener('dragover',e=>{e.preventDefault();grid.classList.add('drag-over');});
+  grid.addEventListener('dragleave',()=>grid.classList.remove('drag-over'));
+  grid.addEventListener('drop',e=>{e.preventDefault();grid.classList.remove('drag-over');if(dragCard&&dragCard.parentNode!==grid)grid.appendChild(dragCard);});
+});
+
+/* DRAG - members */
+let dragMem=null;
+function enableMemDrag(row){
+  row.setAttribute('draggable','true');
+  row.addEventListener('dragstart',e=>{dragMem=row;row.classList.add('dragging-mem');e.stopPropagation();e.dataTransfer.effectAllowed='move';});
+  row.addEventListener('dragend',()=>{row.classList.remove('dragging-mem');document.querySelectorAll('.over-mem').forEach(r=>r.classList.remove('over-mem'));dragMem=null;});
+  row.addEventListener('dragover',e=>{e.preventDefault();e.stopPropagation();if(dragMem&&dragMem!==row)row.classList.add('over-mem');});
+  row.addEventListener('dragleave',()=>row.classList.remove('over-mem'));
+  row.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();row.classList.remove('over-mem');if(dragMem&&dragMem!==row){const c=row.parentNode;const rows=[...c.querySelectorAll('.mem-row')];c.insertBefore(dragMem,rows[rows.indexOf(row)]);renumMembers(c);}});
+}
+function renumMembers(container){container.querySelectorAll('.mem-row').forEach((r,i)=>{const n=r.querySelector('.mem-num');if(n)n.textContent=i+1;});}
+
+/* BUILD CARD */
+function buildCard(t){
+  const color=t.color||nextColor();const id=t.id||'card_'+Date.now();
+  const card=document.createElement('div');card.className='team-card';card.style.setProperty('--tc',color);
+  card.innerHTML=`
+    <div class="card-drag-handle" title="Drag card">⠿⠿</div>
+    <div class="color-dot" style="background:${color}" title="Change color"></div>
+    <div class="team-card-inner">
+      <div class="card-accent-bar" style="background:linear-gradient(90deg,${color},transparent)"></div>
+      <div class="card-head">
+        <div class="card-tag" contenteditable="true" style="color:${color}">${t.tag||'TEAM TAG'}</div>
+        <div class="card-title" contenteditable="true" style="color:${color}">${t.title||'Team Name'}</div>
+        <div class="card-desc" contenteditable="true">${t.desc||'Click to edit...'}</div>
+      </div>
+      <div class="card-body">
+        <div class="card-members">
+          ${(t.members||[]).map((m,i)=>`<div class="mem-row" draggable="true"><div class="mem-num" style="color:${color}">${i+1}</div><div style="flex:1"><div class="mem-name" contenteditable="true">${m.name}</div><div class="mem-bind" contenteditable="true">${m.bind}</div></div></div>`).join('')}
+        </div>
+        <div class="card-img-right" id="panel-${id}" onclick="openModal('${id}')">
+          <img src="" alt="">
+          <div class="img-right-overlay"><div class="ov-icon">🖼</div><div>Click to add image</div></div>
+        </div>
+      </div>
+      <div class="card-foot">
+        <div class="foot-content"></div>
+        <div style="text-align:center;margin-top:10px;border-top:1px solid rgba(255,255,255,.05);padding-top:10px">
+          <button class="edit-btn" onclick="addModBox(this)">➕ Require Box</button>
+          <button class="edit-btn" onclick="addTipsBox(this)">➕ Tips Box</button>
+          <button class="edit-btn" onclick="addWarnBox(this)">➕ Danger Box</button>
+          <button class="edit-btn" onclick="openH1Modal(this)">➕ Heading</button>
+          <button class="edit-btn" onclick="addMember(this)">➕ Unit</button>
+        </div>
+      </div>
+    </div>
+    <button class="delete-team-btn" onclick="this.closest('.team-card').remove()">🗑 Delete</button>`;
+  card.querySelectorAll('.mem-row').forEach(row=>{enableMemDrag(row);const del=document.createElement('span');del.className='delete-mem';del.innerHTML='✕';del.onclick=()=>{row.remove();renumMembers(row.closest('.card-members'));};row.appendChild(del);});
+  const dot=card.querySelector('.color-dot');const pal=makeColorPalette(card,color);card.appendChild(pal);
+  dot.addEventListener('click',e=>{e.stopPropagation();pal.classList.toggle('open');});
   document.addEventListener('click',()=>pal.classList.remove('open'),true);
-
-  /* card drag (handle only) */
-  const handle = card.querySelector('.card-drag-handle');
+  const handle=card.querySelector('.card-drag-handle');
   handle.addEventListener('mousedown',()=>card.setAttribute('draggable','true'));
   card.addEventListener('dragend',()=>card.setAttribute('draggable','false'));
   enableCardDrag(card);
-
   return card;
 }
 
-/* ═══════════════════════════════════════════════
-   FOOTER BOX BUILDERS
-═══════════════════════════════════════════════ */
-function getFC(btn){ return btn.closest('.card-foot').querySelector('.foot-content'); }
-
-function addModBox(btn){
-  const b=document.createElement('div'); b.className='mod-box';
-  b.innerHTML=`<div class="mod-title" contenteditable="true">🔶 REQUIRED — MAX BOTH MODIFIERS</div>
-    <div class="mod-list"></div>
-    <button class="add-point-btn" onclick="addPt(this)">+ Tambah Point</button>
-    <span class="delete-box" onclick="this.closest('.mod-box').remove()">✕</span>`;
-  addPtTo(b.querySelector('.mod-list'));
-  getFC(btn).appendChild(b);
-}
-function addPt(btn){ addPtTo(btn.parentElement.querySelector('.mod-list')); }
-function addPtTo(list){
-  const i=document.createElement('div');
-  i.className='mod-item';i.contentEditable=true;i.textContent='New Point';
-  list.appendChild(i);
-}
-function addTipsBox(btn){
-  const b=document.createElement('div'); b.className='tips-box';
-  b.innerHTML=`<div class="tips-title" contenteditable="true">💡 TIPS</div>
-    <div class="tips-list"></div>
-    <button class="add-point-btn" onclick="addTp(this)">+ Tambah Point</button>
-    <span class="delete-box" onclick="this.closest('.tips-box').remove()">✕</span>`;
-  addTpTo(b.querySelector('.tips-list'));
-  getFC(btn).appendChild(b);
-}
-function addTp(btn){ addTpTo(btn.parentElement.querySelector('.tips-list')); }
-function addTpTo(list){
-  const i=document.createElement('div');
-  i.className='tips-item';i.contentEditable=true;i.textContent='New Tips';
-  list.appendChild(i);
-}
-function addWarnBox(btn){
-  const b=document.createElement('div'); b.className='warn-box'; b.contentEditable=true;
-  b.innerHTML=`⚠ Tulis peringatan di sini...<span class="delete-box" onclick="this.closest('.warn-box').remove()">✕</span>`;
-  getFC(btn).appendChild(b);
-}
+/* FOOTER BUILDERS */
+function getFC(btn){return btn.closest('.card-foot').querySelector('.foot-content');}
+function addModBox(btn){const b=document.createElement('div');b.className='mod-box';b.innerHTML=`<div class="mod-title" contenteditable="true">🔶 REQUIRED — MAX BOTH MODIFIERS</div><div class="mod-list"></div><button class="add-point-btn" onclick="addPt(this)">+ Add Point</button><span class="delete-box" onclick="this.closest('.mod-box').remove()">✕</span>`;addPtTo(b.querySelector('.mod-list'));getFC(btn).appendChild(b);}
+function addPt(btn){addPtTo(btn.parentElement.querySelector('.mod-list'));}
+function addPtTo(list){const i=document.createElement('div');i.className='mod-item';i.contentEditable=true;i.textContent='New Point';list.appendChild(i);}
+function addTipsBox(btn){const b=document.createElement('div');b.className='tips-box';b.innerHTML=`<div class="tips-title" contenteditable="true">💡 TIPS</div><div class="tips-list"></div><button class="add-point-btn" onclick="addTp(this)">+ Add Point</button><span class="delete-box" onclick="this.closest('.tips-box').remove()">✕</span>`;addTpTo(b.querySelector('.tips-list'));getFC(btn).appendChild(b);}
+function addTp(btn){addTpTo(btn.parentElement.querySelector('.tips-list'));}
+function addTpTo(list){const i=document.createElement('div');i.className='tips-item';i.contentEditable=true;i.textContent='New Tips';list.appendChild(i);}
+function addWarnBox(btn){const b=document.createElement('div');b.className='warn-box';b.contentEditable=true;b.innerHTML=`⚠ Write warning here...<span class="delete-box" onclick="this.closest('.warn-box').remove()">✕</span>`;getFC(btn).appendChild(b);}
 function addMember(btn){
   const container=btn.closest('.team-card').querySelector('.card-members');
   const color=getComputedStyle(btn.closest('.team-card')).getPropertyValue('--tc').trim()||'#f5c842';
   const num=container.querySelectorAll('.mem-row').length+1;
-  const row=document.createElement('div'); row.className='mem-row';
-  row.innerHTML=`<div class="mem-num" style="color:${color}">${num}</div>
-    <div style="flex:1">
-      <div class="mem-name" contenteditable="true">Nama Unit Baru</div>
-      <div class="mem-bind" contenteditable="true">· Binding Vow</div>
-    </div>`;
-  const del=document.createElement('span');
-  del.className='delete-mem'; del.innerHTML='✕';
-  del.onclick=()=>{ row.remove(); renumMembers(container); };
-  row.appendChild(del);
-  enableMemDrag(row);
-  container.appendChild(row);
+  const row=document.createElement('div');row.className='mem-row';
+  row.innerHTML=`<div class="mem-num" style="color:${color}">${num}</div><div style="flex:1"><div class="mem-name" contenteditable="true">New Unit Name</div><div class="mem-bind" contenteditable="true">· Binding Vow</div></div>`;
+  const del=document.createElement('span');del.className='delete-mem';del.innerHTML='✕';del.onclick=()=>{row.remove();renumMembers(container);};row.appendChild(del);enableMemDrag(row);container.appendChild(row);
 }
 
-/* ═══════════════════════════════════════════════
-   ADD NEW TEAM
-═══════════════════════════════════════════════ */
-function addNewCoreTeam(){
-  const card=buildCard({id:'core_'+Date.now(),tag:'TEAM CORE BARU',title:'New Core Team',
-    desc:'Klik teks untuk mengedit...',members:[{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'}]});
-  document.getElementById('coreGrid').appendChild(card);
-  card.scrollIntoView({behavior:'smooth',block:'center'});
-}
-function addNewTeam(){
-  const card=buildCard({id:'new_'+Date.now(),tag:'TEAM BARU',title:'New Team',
-    desc:'Klik teks untuk mengedit...',members:[{name:'Unit Baru',bind:'Binding Vow'}]});
-  document.getElementById('newGrid').appendChild(card);
-  card.scrollIntoView({behavior:'smooth',block:'center'});
-}
+/* ADD TEAM */
+function addNewCoreTeam(){const card=buildCard({id:'core_'+Date.now(),tag:'NEW CORE TEAM',title:'New Core Team',desc:'Click text to edit...',members:[{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'}]});document.getElementById('coreGrid').appendChild(card);card.scrollIntoView({behavior:'smooth',block:'center'});}
+function addNewTeam(){const card=buildCard({id:'new_'+Date.now(),tag:'NEW TEAM',title:'New Team',desc:'Click text to edit...',members:[{name:'New Unit',bind:'Binding Vow'}]});document.getElementById('newGrid').appendChild(card);card.scrollIntoView({behavior:'smooth',block:'center'});}
+function addNewStoryCoreTeam(){const card=buildCard({id:'story_core_'+Date.now(),tag:'NEW STORY CORE TEAM',title:'New Story Core Team',desc:'Click text to edit...',members:[{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'}]});document.getElementById('storyCoreGrid').appendChild(card);card.scrollIntoView({behavior:'smooth',block:'center'});}
+function addNewStoryTeam(){const card=buildCard({id:'story_new_'+Date.now(),tag:'NEW STORY TEAM',title:'New Story Team',desc:'Click text to edit...',members:[{name:'New Unit',bind:'Binding Vow'}]});document.getElementById('storyNewGrid').appendChild(card);card.scrollIntoView({behavior:'smooth',block:'center'});}
 
-/* ═══════════════════════════════════════════════
-   DOWNLOAD AS IMAGE
-═══════════════════════════════════════════════ */
+/* DOWNLOAD — sembunyikan tombol edit + cred-edit-btn + float-xl */
 function downloadAsImage(){
-  const hide=document.querySelectorAll('.edit-btn,.delete-mem,.delete-team-btn,.delete-box,.add-point-btn,.card-drag-handle,.color-dot,.clr-palette,.block-handle');
+  const hide=document.querySelectorAll('.edit-btn,.delete-mem,.delete-team-btn,.delete-box,.add-point-btn,.card-drag-handle,.color-dot,.clr-palette,.block-handle,.cred-edit-btn,.float-xl,.add-banner-btn,.add-banner-bar,.save-bar,#downloadBtn');
   hide.forEach(el=>el.style.display='none');
-  document.querySelectorAll('.team-card').forEach(card=>{
-    if(!card.querySelector('.watermark')){
-      const wm=document.createElement('div'); wm.className='watermark'; wm.textContent='By AnotherUseru';
-      card.appendChild(wm);
-    }
-  });
+  document.querySelectorAll('.team-card').forEach(card=>{if(!card.querySelector('.watermark')){const wm=document.createElement('div');wm.className='watermark';wm.textContent='By AnotherUseru';card.appendChild(wm);}});
   setTimeout(()=>{
     html2canvas(document.body,{scale:2,useCORS:true,backgroundColor:'#0f0f17',logging:false})
-    .then(canvas=>{
-      const a=document.createElement('a');
-      a.download='Team_Composition_Guide_By_AnotherUseru.png';
-      a.href=canvas.toDataURL('image/png'); a.click();
-      hide.forEach(el=>el.style.display='');
-      document.querySelectorAll('.watermark').forEach(w=>w.remove());
-    }).catch(err=>{
-      console.error(err); alert('Gagal download. Refresh dan coba lagi.');
-      hide.forEach(el=>el.style.display='');
-    });
+    .then(canvas=>{const a=document.createElement('a');a.download='Team_Composition_Guide_By_AnotherUseru.png';a.href=canvas.toDataURL('image/png');a.click();hide.forEach(el=>el.style.display='');document.querySelectorAll('.watermark').forEach(w=>w.remove());})
+    .catch(err=>{console.error(err);alert('Failed to download. Refresh and try again.');hide.forEach(el=>el.style.display='');});
   },400);
 }
 
-/* ═══════════════════════════════════════════════
-   INITIAL DATA
-═══════════════════════════════════════════════ */
+/* INITIAL DATA */
 const CORE_TEAMS=[
-  {id:'t1',color:'#f5c842',tag:'TEAM 1 · COLUMN 1',title:'130+ Floors Push',
-   desc:'Best used from Floor 130+. Main late-game progression. Higher rarity = better results.',
-   members:[{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'},{name:'Merged Beast',bind:'Fallen Knight'},
-            {name:'Healing Fist',bind:'Binding Light'},{name:'Divine Emperor',bind:'Binding Vow'}]},
-  {id:'t2',color:'#c36bff',tag:'TEAM 2 · COLUMN 2',title:'Best Dungeon Team',
-   desc:'Best overall dungeon & boss team. Use from Floor 140–190+. Very strong late-game team.',
-   members:[{name:'Cosmic Villain',bind:'Binding Vow'},{name:'Awakened Eclipseborn Hawk',bind:'Binding Light'},
-            {name:'Divine Emperor',bind:'Binding Vow'},{name:'Herald',bind:'Binding Vow'}]},
-  {id:'t3',color:'#00d4ff',tag:'TEAM 3 · COLUMN 3',title:'Speed Run Team',
-   desc:'Fast clear team. Works best up to Floor 140. Starts falling off after 140.',
-   members:[{name:'Cosmic Villain',bind:'Binding Vow'},{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'},
-            {name:'King of Hell — Hades',bind:'Demonic Gift'},{name:'Divine Emperor',bind:'Binding Vow'}]},
-  {id:'t4',color:'#00e87a',tag:'TEAM 4 · COLUMN 4',title:'Late Game Variant',
-   desc:'Version of Team 2. Used for Floor 140–200+. Includes Sacred Arch Priestess who heals Qin.',
-   members:[{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'},{name:'Healing Fist',bind:'Binding Light'},
-            {name:'Divine Emperor',bind:'Binding Vow'},{name:'Sacred Arch Priestess',bind:'Binding Vow'}]},
+  {id:'t1',color:'#f5c842',tag:'TEAM 1 · COLUMN 1',title:'130+ Floors Push',desc:'Best used from Floor 130+. Main late-game progression. Higher rarity = better results.',members:[{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'},{name:'Merged Beast',bind:'Fallen Knight'},{name:'Healing Fist',bind:'Binding Light'},{name:'Divine Emperor',bind:'Binding Vow'}]},
+  {id:'t2',color:'#c36bff',tag:'TEAM 2 · COLUMN 2',title:'Best Dungeon Team',desc:'Best overall dungeon & boss team. Use from Floor 140–190+. Very strong late-game team.',members:[{name:'Cosmic Villain',bind:'Binding Vow'},{name:'Awakened Eclipseborn Hawk',bind:'Binding Light'},{name:'Divine Emperor',bind:'Binding Vow'},{name:'Herald',bind:'Binding Vow'}]},
+  {id:'t3',color:'#00d4ff',tag:'TEAM 3 · COLUMN 3',title:'Speed Run Team',desc:'Fast clear team. Works best up to Floor 140. Starts falling off after 140.',members:[{name:'Cosmic Villain',bind:'Binding Vow'},{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'},{name:'King of Hell — Hades',bind:'Demonic Gift'},{name:'Divine Emperor',bind:'Binding Vow'}]},
+  {id:'t4',color:'#00e87a',tag:'TEAM 4 · COLUMN 4',title:'Late Game Variant',desc:'Version of Team 2. Used for Floor 140–200+. Includes Sacred Arch Priestess who heals Qin.',members:[{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'},{name:'Healing Fist',bind:'Binding Light'},{name:'Divine Emperor',bind:'Binding Vow'},{name:'Sacred Arch Priestess',bind:'Binding Vow'}]},
 ];
 const NEW_TEAMS=[
-  {id:'t5',color:'#ff8c42',tag:'TEAM 5',title:'New Team Alpha',
-   desc:'One of the newest and best teams. Requires maxed modifiers to function well.',
-   members:[{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'},{name:'Healing Fist',bind:'Binding Light'},
-            {name:'Divine Emperor',bind:'Binding Vow'},{name:'Herald',bind:'Binding Vow'}]},
-  {id:'t6',color:'#ff5fa0',tag:'TEAM 6',title:'New Team Beta',
-   desc:'One of the best teams — possibly the best. Consistently reaches 220+ floors minimum.',
-   members:[{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'},{name:'Merged Beast',bind:'Binding Light'},
-            {name:'Divine Emperor',bind:'Binding Vow'},{name:'Sacred Arch Priestess',bind:'Binding Vow'}]},
+  {id:'t5',color:'#ff8c42',tag:'TEAM 5',title:'New Team Alpha',desc:'One of the newest and best teams. Requires maxed modifiers to function well.',members:[{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'},{name:'Healing Fist',bind:'Binding Light'},{name:'Divine Emperor',bind:'Binding Vow'},{name:'Herald',bind:'Binding Vow'}]},
+  {id:'t6',color:'#ff5fa0',tag:'TEAM 6',title:'New Team Beta',desc:'One of the best teams — possibly the best. Consistently reaches 220+ floors minimum.',members:[{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'},{name:'Merged Beast',bind:'Binding Light'},{name:'Divine Emperor',bind:'Binding Vow'},{name:'Sacred Arch Priestess',bind:'Binding Vow'}]},
+];
+const STORY_CORE_TEAMS=[
+  {id:'st1',color:'#f5c842',tag:'STORY TEAM 1',title:'Story Progression Team',desc:'Best for advancing through story chapters.',members:[{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'},{name:'Merged Beast',bind:'Fallen Knight'},{name:'Healing Fist',bind:'Binding Light'},{name:'Divine Emperor',bind:'Binding Vow'}]},
+];
+const STORY_NEW_TEAMS=[
+  {id:'st5',color:'#ff8c42',tag:'STORY TEAM 5',title:'Story New Team Alpha',desc:'New team for story mode.',members:[{name:'Awakened Eclipseborn Hawk',bind:'Binding Vow'},{name:'Healing Fist',bind:'Binding Light'},{name:'Divine Emperor',bind:'Binding Vow'},{name:'Herald',bind:'Binding Vow'}]},
 ];
 
-/* ═══════════════ MP PILLS EDITABLE ═══════════════ */
+/* MP PILLS */
 function createMpPill(text,cls){
   const p=document.createElement('span');p.className=`mp-pill ${cls}`;p.contentEditable=true;
   p.innerHTML=`${text}<span class="delete-pill" contenteditable="false"> ✕</span>`;
   p.querySelector('.delete-pill').addEventListener('click',e=>{
-    e.stopPropagation();
-    const nx=p.nextSibling,pv=p.previousSibling;
+    e.stopPropagation();const nx=p.nextSibling,pv=p.previousSibling;
     if(nx&&nx.classList&&nx.classList.contains('mp-arrow'))nx.remove();
     else if(pv&&pv.classList&&pv.classList.contains('mp-arrow'))pv.remove();
     p.remove();
@@ -960,200 +686,245 @@ function addNewMpPill(){
   const p=createMpPill('New Modifier',cls[Math.floor(Math.random()*cls.length)]);
   chain.appendChild(p);p.focus();
 }
-function initMpChain(){
-  const chain=document.getElementById('mpChain');chain.innerHTML='';
-  [{t:'Dmg Reduction',c:'red'},{t:'HP Buff',c:'gold'},{t:'Luck',c:'cyan'},
-   {t:'Damage',c:'orange'},{t:'High Roller',c:'purple'},{t:'Other',c:'gray'}]
-  .forEach((x,i)=>{if(i>0)chain.appendChild(mkArrow());chain.appendChild(createMpPill(x.t,x.c));});
-}
 
-/* ═══════════════ EXCEL IMPORT ═══════════════ */
-let xlData=null, xlTarget='core';
-
+/* EXCEL */
+let xlData=null,xlTarget='core';
 function openXl(){document.getElementById('xlModal').classList.add('open');resetXl();}
 function closeXl(){document.getElementById('xlModal').classList.remove('open');}
-function setTarget(t){
-  xlTarget=t;
-  document.getElementById('rCore').className='xl-radio'+(t==='core'?' core':'');
-  document.getElementById('rNew') .className='xl-radio'+(t==='new' ?' new' :'');
-}
-function resetXl(){
-  xlData=null;
-  document.getElementById('xlFname').style.display='none';
-  document.getElementById('xlStatus').style.display='none';
-  setTarget('core');
-}
-
+function setTarget(t){xlTarget=t;document.getElementById('rCore').className='xl-radio'+(t==='core'?' core':'');document.getElementById('rNew').className='xl-radio'+(t==='new'?' new':'');document.getElementById('rStoryCore').className='xl-radio'+(t==='story-core'?' core':'');document.getElementById('rStoryNew').className='xl-radio'+(t==='story-new'?' new':'');}
+function resetXl(){xlData=null;document.getElementById('xlFname').style.display='none';document.getElementById('xlStatus').style.display='none';setTarget('core');}
 const xlDrop=document.getElementById('xlDrop');
 xlDrop.addEventListener('dragover',e=>{e.preventDefault();xlDrop.classList.add('on');});
 xlDrop.addEventListener('dragleave',()=>xlDrop.classList.remove('on'));
-xlDrop.addEventListener('drop',e=>{
-  e.preventDefault();xlDrop.classList.remove('on');
-  const f=e.dataTransfer.files[0];
-  if(f){const inp=document.getElementById('xlFile');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;handleXlFile(inp);}
-});
-
+xlDrop.addEventListener('drop',e=>{e.preventDefault();xlDrop.classList.remove('on');const f=e.dataTransfer.files[0];if(f){const inp=document.getElementById('xlFile');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;handleXlFile(inp);}});
 function handleXlFile(inp){
   if(!inp.files||!inp.files[0])return;
-  const file=inp.files[0];
-  document.getElementById('xlFname').textContent='📄 '+file.name;
-  document.getElementById('xlFname').style.display='block';
+  const file=inp.files[0];document.getElementById('xlFname').textContent='📄 '+file.name;document.getElementById('xlFname').style.display='block';
   const reader=new FileReader();
-  reader.onload=e=>{
-    try{
-      const wb=XLSX.read(e.target.result,{type:'array'});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-      xlData=parseTemplate(raw);
-      if(!xlData.length)throw new Error('Tidak ada data team ditemukan.');
-      showXlStatus('ok',`✅ ${xlData.length} team siap diimport.`);
-    }catch(err){showXlStatus('err','❌ '+err.message);xlData=null;}
-  };
+  reader.onload=e=>{try{const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});xlData=parseTemplate(raw);if(!xlData.length)throw new Error('No team data found.');showXlStatus('ok',`✅ ${xlData.length} teams ready to import.`);}catch(err){showXlStatus('err','❌ '+err.message);xlData=null;}};
   reader.readAsArrayBuffer(file);
 }
-
-/*
-  FORMAT EXCEL (kolom A, 1 kolom):
-  Team 1          ← nama team (baris pertama setelah kosong / awal)
-  Floor 130       ← deskripsi
-  1.Unit,Binding  ← member (diawali angka)
-  require         ← keyword → baris berikutnya masuk Require Box
-  isi require
-  tips            ← keyword → baris berikutnya masuk Tips Box
-  isi tips
-  warning         ← keyword → baris berikutnya masuk Warning Box
-  isi warning
-                  ← baris kosong = team berikutnya
-*/
 function parseTemplate(rows){
-  const KEYWORDS={
-    require:'require', required:'require',
-    tips:'tips', tip:'tips',
-    warning:'warning', warn:'warning', danger:'warning'
-  };
-  const teams=[];
-  let cur=null, section=null;
-
+  const KW={require:'require',required:'require',tips:'tips',tip:'tips',warning:'warning',warn:'warning',danger:'warning'};
+  const teams=[];let cur=null,section=null;
   const flush=()=>{if(cur&&cur.title)teams.push(cur);};
-
   for(let i=0;i<rows.length;i++){
     const cell=String(rows[i][0]||rows[i][1]||'').trim();
-
-    // baris kosong = team baru
     if(!cell){flush();cur=null;section=null;continue;}
-
     const low=cell.toLowerCase();
-
-    // cek keyword section
-    if(KEYWORDS[low]){
-      if(cur){
-        section=KEYWORDS[low];
-        if(!cur[section])cur[section]=[];
-      }
-      continue;
-    }
-
-    // cek member: diawali angka + titik/kurung
-    const memMatch=cell.match(/^(\d+)[.)]\s*(.+)/);
-    if(memMatch&&cur){
-      section=null;
-      const parts=memMatch[2].split(/[,|]/);
-      cur.members.push({name:(parts[0]||'').trim(),bind:(parts[1]||'Binding Vow').trim()});
-      continue;
-    }
-
-    // isi section aktif
+    if(KW[low]){if(cur){section=KW[low];if(!cur[section])cur[section]=[];}continue;}
+    const mm=cell.match(/^(\d+)[.)]\s*(.+)/);
+    if(mm&&cur){section=null;const parts=mm[2].split(/[,|]/);cur.members.push({name:(parts[0]||'').trim(),bind:(parts[1]||'Binding Vow').trim()});continue;}
     if(section&&cur){cur[section].push(cell);continue;}
-
-    // baris biasa → team baru atau deskripsi
-    if(!cur){
-      cur={title:cell,tag:cell.toUpperCase(),desc:'',members:[],require:[],tips:[],warning:[]};
-      section=null;
-    } else if(!cur.desc){
-      cur.desc=cell;
-    }
+    if(!cur){cur={title:cell,tag:cell.toUpperCase(),desc:'',members:[],require:[],tips:[],warning:[]};section=null;}
+    else if(!cur.desc){cur.desc=cell;}
   }
-  flush();
-  return teams;
+  flush();return teams;
 }
-
-function showXlStatus(type,msg){
-  const el=document.getElementById('xlStatus');
-  el.className='xl-status '+type;el.style.display='block';el.textContent=msg;
-}
-
+function showXlStatus(type,msg){const el=document.getElementById('xlStatus');el.className='xl-status '+type;el.style.display='block';el.textContent=msg;}
 function doImport(){
-  if(!xlData||!xlData.length){showXlStatus('err','❌ Upload file dulu!');return;}
-  const grid=document.getElementById(xlTarget==='core'?'coreGrid':'newGrid');
+  if(!xlData||!xlData.length){showXlStatus('err','❌ Upload file first!');return;}
+  let gridId;
+  if(xlTarget==='core') gridId='coreGrid';
+  else if(xlTarget==='new') gridId='newGrid';
+  else if(xlTarget==='story-core') gridId='storyCoreGrid';
+  else if(xlTarget==='story-new') gridId='storyNewGrid';
+  const grid=document.getElementById(gridId);
   xlData.forEach(t=>{
     const color=TEAM_COLORS[colorIdx++%TEAM_COLORS.length];
     const card=buildCard({id:'xl_'+Date.now()+Math.random(),tag:t.tag,title:t.title,desc:t.desc,color,members:t.members});
     const fc=card.querySelector('.foot-content');
-
-    // Require box
-    if(t.require&&t.require.length){
-      const b=document.createElement('div');b.className='mod-box';
-      b.innerHTML=`<div class="mod-title" contenteditable="true">🔶 REQUIRED</div>
-        <div class="mod-list">${t.require.map(x=>`<div class="mod-item" contenteditable="true">${x}</div>`).join('')}</div>
-        <button class="add-point-btn" onclick="addPt(this)">+ Tambah Point</button>
-        <span class="delete-box" onclick="this.closest('.mod-box').remove()">✕</span>`;
-      fc.appendChild(b);
-    }
-
-    // Tips box  ← INI YANG DITAMBAH, TERPISAH DARI WARNING
-    if(t.tips&&t.tips.length){
-      const b=document.createElement('div');b.className='tips-box';
-      b.innerHTML=`<div class="tips-title" contenteditable="true">💡 TIPS</div>
-        <div class="tips-list">${t.tips.map(x=>`<div class="tips-item" contenteditable="true">${x}</div>`).join('')}</div>
-        <button class="add-point-btn" onclick="addTp(this)">+ Tambah Point</button>
-        <span class="delete-box" onclick="this.closest('.tips-box').remove()">✕</span>`;
-      fc.appendChild(b);
-    }
-
-    // Warning box
-    if(t.warning&&t.warning.length){
-      const w=document.createElement('div');w.className='warn-box';w.contentEditable=true;
-      w.innerHTML=`⚠ ${t.warning.join(' — ')}<span class="delete-box" onclick="this.closest('.warn-box').remove()">✕</span>`;
-      fc.appendChild(w);
-    }
-
+    if(t.require&&t.require.length){const b=document.createElement('div');b.className='mod-box';b.innerHTML=`<div class="mod-title" contenteditable="true">🔶 REQUIRED</div><div class="mod-list">${t.require.map(x=>`<div class="mod-item" contenteditable="true">${x}</div>`).join('')}</div><button class="add-point-btn" onclick="addPt(this)">+ Add Point</button><span class="delete-box" onclick="this.closest('.mod-box').remove()">✕</span>`;fc.appendChild(b);}
+    if(t.tips&&t.tips.length){const b=document.createElement('div');b.className='tips-box';b.innerHTML=`<div class="tips-title" contenteditable="true">💡 TIPS</div><div class="tips-list">${t.tips.map(x=>`<div class="tips-item" contenteditable="true">${x}</div>`).join('')}</div><button class="add-point-btn" onclick="addTp(this)">+ Add Point</button><span class="delete-box" onclick="this.closest('.tips-box').remove()">✕</span>`;fc.appendChild(b);}
+    if(t.warning&&t.warning.length){const w=document.createElement('div');w.className='warn-box';w.contentEditable=true;w.innerHTML=`⚠ ${t.warning.join(' — ')}<span class="delete-box" onclick="this.closest('.warn-box').remove()">✕</span>`;fc.appendChild(w);}
     grid.appendChild(card);
   });
-  showXlStatus('ok',`✅ ${xlData.length} team berhasil ditambahkan!`);
-  setTimeout(()=>closeXl(),1500);
+  showXlStatus('ok',`✅ ${xlData.length} teams successfully added!`);setTimeout(()=>closeXl(),1500);
+}
+function downloadTemplate(){
+  const tmpl=[['Team 1'],['Floor 130'],['1.Divine Emperor,Demonic Gift'],['2.Awakened Eclipseborn Hawk,Binding Vow'],['3.Healing Fist,Binding Light'],['4.Merged Beast,Fallen Knight'],['require'],['Max Damage Reduction'],['Max HP Buff'],['tips'],['Use on floor 140+ for best results'],['warning'],['Do not use Merged Beast Secret'],[''],['Team 2'],['Best Dungeon 140-190+'],['1.Cosmic Villain,Binding Vow'],['2.Awakened Eclipseborn Hawk,Binding Light'],['3.Divine Emperor,Binding Vow'],['4.Herald,Binding Vow'],['require'],['Damage Reduction 30%'],['Health Buff 50%'],['tips'],['If Qin uses Vow, put Sacred Arch Mage in slot 2'],['']];
+  const ws=XLSX.utils.aoa_to_sheet(tmpl);ws['!cols']=[{wch:45}];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Teams');XLSX.writeFile(wb,'Team_Template.xlsx');
 }
 
-function downloadTemplate(){
-  const tmpl=[
-    ['Team 1'],['Floor 130'],
-    ['1.Divine Emperor,Demonic Gift'],['2.Awakened Eclipseborn Hawk,Binding Vow'],
-    ['3.Healing Fist,Binding Light'],['4.Merged Beast,Fallen Knight'],
-    ['require'],['Max Damage Reduction'],['Max HP Buff'],
-    ['tips'],['Gunakan di floor 140+ untuk hasil terbaik'],
-    ['warning'],['Do not use Merged Beast Secret'],
-    [''],
-    ['Team 2'],['Best Dungeon 140-190+'],
-    ['1.Cosmic Villain,Binding Vow'],['2.Awakened Eclipseborn Hawk,Binding Light'],
-    ['3.Divine Emperor,Binding Vow'],['4.Herald,Binding Vow'],
-    ['require'],['Damage Reduction 30%'],['Health Buff 50%'],
-    ['tips'],['Jika Qin pakai Vow, taruh Sacred Arch Mage di slot 2'],
-    [''],
-  ];
-  const ws=XLSX.utils.aoa_to_sheet(tmpl);
-  ws['!cols']=[{wch:45}];
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Teams');
-  XLSX.writeFile(wb,'Team_Template.xlsx');
+/* CREDITS MODAL */
+const CRED_COLORS=['#f5c842','#c36bff','#00d4ff','#00e87a','#ff8c42','#ff5fa0','#4488ff','#ff3355','#ffffff'];
+let credSections=[];
+
+function openCredModal(){renderCredFormSections();document.getElementById('credModal').classList.add('open');}
+function closeCredModal(){document.getElementById('credModal').classList.remove('open');}
+
+function renderCredFormSections(){
+  const list=document.getElementById('cf-sections-list');list.innerHTML='';
+  credSections.forEach((sec,si)=>{
+    const block=document.createElement('div');block.className='cred-sec-block';block.dataset.si=si;
+    const swatches=CRED_COLORS.map(c=>`<div class="sec-cp-sw" style="background:${c}" onclick="credSetColor(${si},'${c}')"></div>`).join('');
+    block.innerHTML=`
+      <div class="sec-header">
+        <input class="sec-label-input" type="text" value="${sec.label}" placeholder="Section name..." oninput="credSections[${si}].label=this.value">
+        <div class="sec-color-dot" style="background:${sec.color}" title="Change color" onclick="credTogglePalette(${si},event)">
+          <div class="sec-color-palette" id="pal-${si}">${swatches}<input type="color" class="sec-cp-custom" value="${sec.color}" title="Custom" oninput="credSetColor(${si},this.value)"></div>
+        </div>
+        <button class="sec-rm-btn" onclick="credRemoveSection(${si})">🗑</button>
+      </div>
+      <div class="cred-field-rows" id="names-${si}">${sec.names.map((n,ni)=>credNameRowHTML(si,ni,n)).join('')}</div>
+      <button class="cred-add-name-btn" onclick="credAddName(${si})">+ Add Name</button>`;
+    list.appendChild(block);
+  });
+}
+function credNameRowHTML(si,ni,val){return `<div class="cred-field-row" data-ni="${ni}"><input type="text" value="${val.replace(/"/g,'&quot;')}" placeholder="Name..." oninput="credSections[${si}].names[${ni}]=this.value"><button class="cred-rm-btn" onclick="credRemoveName(${si},${ni})">✕</button></div>`;}
+function credTogglePalette(si,e){e.stopPropagation();const pal=document.getElementById('pal-'+si);const isOpen=pal.classList.contains('open');document.querySelectorAll('.sec-color-palette.open').forEach(p=>p.classList.remove('open'));if(!isOpen)pal.classList.add('open');}
+document.addEventListener('click',()=>{document.querySelectorAll('.sec-color-palette.open').forEach(p=>p.classList.remove('open'));});
+function credSetColor(si,color){credSections[si].color=color;const block=document.querySelector(`.cred-sec-block[data-si="${si}"]`);if(block){block.querySelector('.sec-color-dot').style.background=color;block.querySelector('.sec-cp-custom').value=color;}document.querySelectorAll('.sec-color-palette.open').forEach(p=>p.classList.remove('open'));}
+function credRemoveSection(si){credSections.splice(si,1);renderCredFormSections();}
+function credAddSection(){credSections.push({label:'NEW SECTION',color:'#00d4ff',names:['']});renderCredFormSections();const box=document.querySelector('.cred-modal-box');box.scrollTop=box.scrollHeight;}
+function credAddName(si){credSections[si].names.push('');renderCredFormSections();const rows=document.querySelectorAll(`#names-${si} .cred-field-row input`);if(rows.length)rows[rows.length-1].focus();}
+function credRemoveName(si,ni){credSections[si].names.splice(ni,1);renderCredFormSections();}
+function applyCredits(){
+  document.querySelectorAll('.cred-sec-block').forEach((block,si)=>{
+    const lbl=block.querySelector('.sec-label-input');
+    if(lbl&&credSections[si])credSections[si].label=lbl.value.trim().toUpperCase()||'SECTION';
+    block.querySelectorAll('.cred-field-rows .cred-field-row').forEach((row,ni)=>{const inp=row.querySelector('input');if(inp&&credSections[si])credSections[si].names[ni]=inp.value.trim();});
+  });
+  let html='';
+  credSections.forEach(sec=>{
+    const names=sec.names.filter(Boolean);if(!names.length)return;
+    html+=`<div class="cred-lbl" style="margin-top:8px">${sec.label}</div>`;
+    names.forEach(n=>{html+=`<div class="cred-name" style="font-size:.88rem;margin-bottom:5px;color:${sec.color};text-shadow:0 0 12px ${sec.color}55">${n}</div>`;});
+  });
+  document.getElementById('credSectionsDisplay').innerHTML=html;
+  closeCredModal();
+}
+
+/* ═══════════════ LOCAL STORAGE SAVE/LOAD ═══════════════ */
+const SAVE_KEY = 'ACB_GUIDE_SAVE';
+
+function showToast(msg, isErr){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(isErr?' err':'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function saveLocal(){
+  try{
+    const data={
+      dungeonHTML: document.getElementById('dungeonSection').innerHTML,
+      storyHTML:   document.getElementById('storySection').innerHTML,
+      mpChain:     document.getElementById('mpChain').innerHTML,
+      credDisplay: document.getElementById('credSectionsDisplay').innerHTML,
+      credSections: JSON.stringify(credSections),
+      savedAt: new Date().toLocaleString()
+    };
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+    document.getElementById('saveStatus').textContent = '✅ Saved at '+data.savedAt;
+    showToast('✅ Data berhasil disimpan ke local!');
+  } catch(e){
+    showToast('❌ Gagal menyimpan: '+e.message, true);
+  }
+}
+
+function loadLocal(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY);
+    if(!raw){ showToast('⚠ Tidak ada save yang ditemukan.', true); return; }
+    const data=JSON.parse(raw);
+    if(data.dungeonHTML) document.getElementById('dungeonSection').innerHTML=data.dungeonHTML;
+    if(data.storyHTML)   document.getElementById('storySection').innerHTML=data.storyHTML;
+    if(data.mpChain)     document.getElementById('mpChain').innerHTML=data.mpChain;
+    if(data.credDisplay) document.getElementById('credSectionsDisplay').innerHTML=data.credDisplay;
+    if(data.credSections) credSections=JSON.parse(data.credSections);
+    rewireAll();
+    document.getElementById('saveStatus').textContent = '📂 Loaded from '+data.savedAt;
+    showToast('📂 Data berhasil dimuat!');
+  } catch(e){
+    showToast('❌ Gagal load: '+e.message, true);
+  }
+}
+
+function deleteLocal(){
+  if(!localStorage.getItem(SAVE_KEY)){ showToast('⚠ Tidak ada save.', true); return; }
+  if(!confirm('Hapus semua data yang tersimpan di local? Ini tidak bisa di-undo.')) return;
+  localStorage.removeItem(SAVE_KEY);
+  document.getElementById('saveStatus').textContent = '';
+  showToast('🗑 Save dihapus.');
+}
+
+function rewireAll(){
+  // rewire all drag handles for page blocks
+  document.querySelectorAll('.block-handle').forEach(h=>{
+    const block=h.closest('.page-block'); if(!block) return;
+    h.addEventListener('mousedown',()=>block.setAttribute('draggable','true'));
+    block.addEventListener('dragstart',e=>{dragBlock=block;block.classList.add('dragging-block');e.dataTransfer.effectAllowed='move';e.stopPropagation();});
+    block.addEventListener('dragend',()=>{block.setAttribute('draggable','false');block.classList.remove('dragging-block');document.querySelectorAll('.block-drag-over').forEach(b=>b.classList.remove('block-drag-over'));dragBlock=null;});
+  });
+  // rewire card drags
+  document.querySelectorAll('.team-card').forEach(card=>{
+    enableCardDrag(card);
+    card.querySelectorAll('.mem-row').forEach(row=>{
+      enableMemDrag(row);
+      if(!row.querySelector('.delete-mem')){
+        const del=document.createElement('span');del.className='delete-mem';del.innerHTML='✕';
+        del.onclick=()=>{row.remove();renumMembers(row.closest('.card-members'));};
+        row.appendChild(del);
+      }
+    });
+    const dot=card.querySelector('.color-dot');
+    if(dot && !dot._palWired){
+      dot._palWired=true;
+      const color=getComputedStyle(card).getPropertyValue('--tc').trim()||'#f5c842';
+      const pal=makeColorPalette(card,color);
+      card.appendChild(pal);
+      dot.addEventListener('click',e=>{e.stopPropagation();pal.classList.toggle('open');});
+    }
+    const handle=card.querySelector('.card-drag-handle');
+    if(handle){handle.addEventListener('mousedown',()=>card.setAttribute('draggable','true'));card.addEventListener('dragend',()=>card.setAttribute('draggable','false'));}
+  });
+  document.querySelectorAll('.core-grid,.new-grid').forEach(grid=>{
+    grid.addEventListener('dragover',e=>{e.preventDefault();grid.classList.add('drag-over');});
+    grid.addEventListener('dragleave',()=>grid.classList.remove('drag-over'));
+    grid.addEventListener('drop',e=>{e.preventDefault();grid.classList.remove('drag-over');if(dragCard&&dragCard.parentNode!==grid)grid.appendChild(dragCard);});
+  });
+  // rewire delete-pill in mpChain
+  document.querySelectorAll('.mp-pill').forEach(p=>{
+    const dp=p.querySelector('.delete-pill');
+    if(dp && !dp._wired){
+      dp._wired=true;
+      dp.addEventListener('click',e=>{
+        e.stopPropagation();const nx=p.nextSibling,pv=p.previousSibling;
+        if(nx&&nx.classList&&nx.classList.contains('mp-arrow'))nx.remove();
+        else if(pv&&pv.classList&&pv.classList.contains('mp-arrow'))pv.remove();
+        p.remove();
+      });
+    }
+  });
 }
 
 window.onload=()=>{
-  const cg=document.getElementById('coreGrid');
-  const ng=document.getElementById('newGrid');
+  // try load from localStorage first
+  const raw=localStorage.getItem(SAVE_KEY);
+  if(raw){
+    try{
+      const data=JSON.parse(raw);
+      if(data.dungeonHTML) document.getElementById('dungeonSection').innerHTML=data.dungeonHTML;
+      if(data.storyHTML)   document.getElementById('storySection').innerHTML=data.storyHTML;
+      if(data.mpChain)     document.getElementById('mpChain').innerHTML=data.mpChain;
+      if(data.credDisplay) document.getElementById('credSectionsDisplay').innerHTML=data.credDisplay;
+      if(data.credSections) credSections=JSON.parse(data.credSections);
+      rewireAll();
+      document.getElementById('saveStatus').textContent='📂 Auto-loaded from '+data.savedAt;
+      console.log('%c📂 Auto-loaded from localStorage','color:#00e87a;font-size:13px');
+      return;
+    } catch(e){ console.warn('Auto-load failed, using defaults',e); }
+  }
+  // fallback: load default data
+  const cg=document.getElementById('coreGrid');const ng=document.getElementById('newGrid');
   CORE_TEAMS.forEach(t=>cg.appendChild(buildCard(t)));
   NEW_TEAMS.forEach(t=>ng.appendChild(buildCard(t)));
-  colorIdx=CORE_TEAMS.length+NEW_TEAMS.length;
-  initMpChain();
-  console.log('%c✅ Siap!','color:#00e87a;font-size:14px');
+  const scg=document.getElementById('storyCoreGrid');const sng=document.getElementById('storyNewGrid');
+  if(scg) STORY_CORE_TEAMS.forEach(t=>scg.appendChild(buildCard(t)));
+  if(sng) STORY_NEW_TEAMS.forEach(t=>sng.appendChild(buildCard(t)));
+  colorIdx=CORE_TEAMS.length+NEW_TEAMS.length+STORY_CORE_TEAMS.length+STORY_NEW_TEAMS.length;
+  console.log('%c✅ Ready!','color:#00e87a;font-size:14px');
 };
 </script>
 </body>
